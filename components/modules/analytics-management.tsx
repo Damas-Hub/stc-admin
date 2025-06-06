@@ -53,7 +53,6 @@ interface DriverPerformance {
   onTimeRate: number
 }
 
-// Add these new interfaces after the existing ones:
 
 interface FuelUsage {
   busId: string
@@ -152,7 +151,6 @@ const topDrivers: DriverPerformance[] = [
   { name: "Akosua Boateng", trips: 156, rating: 4.9, onTimeRate: 97 },
 ]
 
-// Add sample data after existing data:
 
 const fuelUsageData: FuelUsage[] = [
   {
@@ -337,7 +335,7 @@ const parcelTrackingData: ParcelTracking[] = [
   },
 ]
 
-// Simple Bar Chart Component
+// Bar Chart Component
 const BarChart = ({ data, height = 200 }: { data: ChartData[]; height?: number }) => {
   const maxRevenue = Math.max(...data.map((d) => d.revenue))
   const maxBookings = Math.max(...data.map((d) => d.bookings))
@@ -383,7 +381,7 @@ const BarChart = ({ data, height = 200 }: { data: ChartData[]; height?: number }
   )
 }
 
-// Simple Line Chart Component
+//Line Chart Component
 const LineChart = ({ data }: { data: ChartData[] }) => {
   const maxRevenue = Math.max(...data.map((d) => d.revenue))
   const width = 300
@@ -572,8 +570,8 @@ export function AnalyticsDashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <header className="space-y-2">
+        <div className="space-y-6">
           <div className="flex justify-between items-center py-6">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Analytics Dashboard</h1>
@@ -589,7 +587,7 @@ export function AnalyticsDashboard() {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="space-y-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:grid-cols-9">
             <TabsTrigger value="overview" className="flex items-center gap-2">
