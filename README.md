@@ -1,1 +1,2 @@
 STC GHANA
+1
