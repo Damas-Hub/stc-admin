@@ -12,8 +12,9 @@ import { ScheduleManagement } from "../modules/schedule-management"
 import { BookingManagement } from "../modules/booking-management"
 import { ParcelManagement } from "../modules/parcel-management"
 import { useAuth } from "../auth/auth-context"
+import { AnalyticsDashboard } from "../modules/analytics-management"
 
-export type ActiveModule = "dashboard" | "routes" | "buses" | "drivers" | "staff" | "schedules" | "bookings" | "parcels"
+export type ActiveModule = "dashboard" | "routes" | "buses" | "drivers" | "staff" | "schedules" | "bookings" | "parcels" | "analytics"
 
 export function Dashboard() {
   const [activeModule, setActiveModule] = useState<ActiveModule>("dashboard")
@@ -37,6 +38,8 @@ export function Dashboard() {
         return <BookingManagement />
       case "parcels":
         return <ParcelManagement />
+      case "analytics":
+        return <AnalyticsDashboard  />
       default:
         return <DashboardOverview />
     }

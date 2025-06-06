@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "../auth/auth-context"
 import type { ActiveModule } from "./dashboard"
-import { LayoutDashboard, Route, Bus, Users, UserCheck, Calendar, Ticket, Package, LogOut } from "lucide-react"
+import { LayoutDashboard, Route, Bus, Users, UserCheck, Calendar, Ticket, Package, LogOut, ChartBar } from "lucide-react"
 
 interface SidebarProps {
   activeModule: ActiveModule
@@ -63,6 +63,13 @@ export function Sidebar({ activeModule, setActiveModule }: SidebarProps) {
       icon: Package,
       roles: ["hq_admin", "station_personnel"],
     },
+    {
+      id: "analytics" as ActiveModule,
+      label: "Analytics",
+      icon: ChartBar,
+      roles: ["hq_admin"],
+    },
+
   ]
 
   const filteredMenuItems = menuItems.filter((item) => item.roles.includes(user?.role || ""))
