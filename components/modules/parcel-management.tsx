@@ -129,11 +129,7 @@ export function ParcelManagement() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Parcel Management</h1>
-          <p className="text-gray-600 mt-2">Manage parcel deliveries and tracking</p>
-        </div>
+      <div className="flex justify-end items-center">
         <Button onClick={handleAddParcel}>
           <Plus className="mr-2 h-4 w-4" />
           New Parcel
@@ -247,7 +243,7 @@ export function ParcelManagement() {
 
       {/* Add/Edit Parcel Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-3xl">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingParcel ? "Edit Parcel" : "New Parcel Booking"}</DialogTitle>
             <DialogDescription>

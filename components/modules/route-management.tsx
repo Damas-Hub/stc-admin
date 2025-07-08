@@ -101,11 +101,7 @@ export function RouteManagement() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Route Management</h1>
-          <p className="text-gray-600 mt-2">Manage transport routes and schedules</p>
-        </div>
+      <div className="flex justify-end items-center">
         <Button onClick={handleAddRoute}>
           <Plus className="mr-2 h-4 w-4" />
           Add Route
@@ -142,7 +138,7 @@ export function RouteManagement() {
       </Card>
 
       {/* Routes Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredRoutes.map((route) => (
           <Card key={route.id} className="hover:shadow-lg transition-shadow">
             <CardHeader>
@@ -203,7 +199,7 @@ export function RouteManagement() {
 
       {/* Add/Edit Route Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-full w-full max-h-[90vh] p-2 sm:p-4 overflow-y-auto flex flex-col gap-2">
           <DialogHeader>
             <DialogTitle>{editingRoute ? "Edit Route" : "Add New Route"}</DialogTitle>
             <DialogDescription>

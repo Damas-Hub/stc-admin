@@ -71,13 +71,8 @@ export function DashboardOverview() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Welcome back, {user?.name}</h1>
-        <p className="text-gray-600 mt-2">Here's what's happening with your transport operations today.</p>
-      </div>
-
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {stats.map((stat, index) => {
           const Icon = stat.icon
           return (
@@ -96,7 +91,7 @@ export function DashboardOverview() {
       </div>
 
       {/* Recent Activities */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
             <CardTitle>Recent Activities</CardTitle>

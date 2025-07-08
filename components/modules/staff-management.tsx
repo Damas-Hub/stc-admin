@@ -115,11 +115,7 @@ export function StaffManagement() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Staff Management</h1>
-          <p className="text-gray-600 mt-2">Manage non-driver staff and their permissions</p>
-        </div>
+      <div className="flex justify-end items-center">
         <Button onClick={handleAddStaff}>
           <Plus className="mr-2 h-4 w-4" />
           Add Staff
@@ -156,7 +152,7 @@ export function StaffManagement() {
       </Card>
 
       {/* Staff Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredStaff.map((staffMember) => (
           <Card key={staffMember.id} className="hover:shadow-lg transition-shadow">
             <CardHeader>
@@ -225,7 +221,7 @@ export function StaffManagement() {
 
       {/* Add/Edit Staff Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-full w-full max-h-[90vh] p-2 sm:p-4 overflow-y-auto flex flex-col gap-2">
           <DialogHeader>
             <DialogTitle>{editingStaff ? "Edit Staff Member" : "Add New Staff Member"}</DialogTitle>
             <DialogDescription>

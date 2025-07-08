@@ -119,11 +119,7 @@ export function DriverManagement() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Driver Management</h1>
-          <p className="text-gray-600 mt-2">Manage drivers and their assignments</p>
-        </div>
+      <div className="flex justify-end items-center">
         <Button onClick={handleAddDriver}>
           <Plus className="mr-2 h-4 w-4" />
           Add Driver
@@ -160,7 +156,7 @@ export function DriverManagement() {
       </Card>
 
       {/* Drivers Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredDrivers.map((driver) => (
           <Card key={driver.id} className="hover:shadow-lg transition-shadow">
             <CardHeader>
@@ -228,7 +224,7 @@ export function DriverManagement() {
 
       {/* Add/Edit Driver Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-full w-full max-h-[90vh] p-2 sm:p-4 overflow-y-auto flex flex-col gap-2">
           <DialogHeader>
             <DialogTitle>{editingDriver ? "Edit Driver" : "Add New Driver"}</DialogTitle>
             <DialogDescription>

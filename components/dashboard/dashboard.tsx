@@ -19,6 +19,7 @@ export type ActiveModule = "dashboard" | "routes" | "buses" | "drivers" | "staff
 export function Dashboard() {
   const [activeModule, setActiveModule] = useState<ActiveModule>("dashboard")
   const { user } = useAuth()
+  const [sidebarOpen, setSidebarOpen] = useState(false)
 
   const renderActiveModule = () => {
     switch (activeModule) {
@@ -47,10 +48,15 @@ export function Dashboard() {
 
   return (
     <div className="flex h-screen bg-gray-50">
-      <Sidebar activeModule={activeModule} setActiveModule={setActiveModule} />
+      <Sidebar
+        activeModule={activeModule}
+        setActiveModule={setActiveModule}
+        mobileOpen={sidebarOpen}
+        setMobileOpen={setSidebarOpen}
+      />
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Header />
-        <main className="flex-1 overflow-auto p-6">{renderActiveModule()}</main>
+        <Header isDashboard={activeModule === "dashboard"} onOpenSidebar={() => setSidebarOpen(true)} />
+        <main className="flex-1 overflow-auto p-3 sm:p-6">{renderActiveModule()}</main>
       </div>
     </div>
   )
