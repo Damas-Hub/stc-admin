@@ -49,7 +49,7 @@ export function Dashboard() {
     <div className="flex h-screen bg-gray-50">
       <Sidebar activeModule={activeModule} setActiveModule={setActiveModule} />
       <div className="flex-1 flex flex-col overflow-hidden">
-        <Header />
+        <Header isDashboard={activeModule === "dashboard"} />
         <main className="flex-1 overflow-auto p-6">{renderActiveModule()}</main>
       </div>
     </div>

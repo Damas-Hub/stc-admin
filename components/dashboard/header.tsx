@@ -1,28 +1,25 @@
 "use client"
 
-import { Bell, Search } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
+import { Bell } from "lucide-react"
+import { useAuth } from "../auth/auth-context"
 
-export function Header() {
+export function Header({ isDashboard }: { isDashboard: boolean }) {
+  const { user } = useAuth();
   return (
     <header className="bg-white shadow-sm border-b px-6 py-4">
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <h2 className="text-2xl font-semibold text-gray-900">Transport Management System</h2>
+        <div>
+          {isDashboard && (
+            <>
+              <h2 className="text-2xl font-semibold text-gray-900">Welcome back, {user?.name}</h2>
+              <p className="text-gray-600 mt-1 text-base">Here's what's happening with your transport operations today.</p>
+            </>
+          )}
         </div>
-
-        <div className="flex items-center space-x-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <Input placeholder="Search..." className="pl-10 w-64" />
-          </div>
-
-          <Button variant="ghost" size="icon">
-            <Bell className="h-5 w-5" />
-          </Button>
-        </div>
+        <button className="relative p-2 rounded-full hover:bg-gray-100">
+          <Bell className="h-6 w-6 text-gray-700" />
+        </button>
       </div>
     </header>
-  )
+  );
 }

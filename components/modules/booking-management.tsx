@@ -195,11 +195,7 @@ export function BookingManagement() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Booking Management</h1>
-          <p className="text-gray-600 mt-2">Manage passenger bookings and seat reservations</p>
-        </div>
+      <div className="flex justify-end items-center">
         <Button onClick={handleAddBooking}>
           <Plus className="mr-2 h-4 w-4" />
           New Booking
