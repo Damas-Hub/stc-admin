@@ -59,17 +59,18 @@ const mockRoutes: Route[] = [
   },
 ]
 
-export function RouteManagement() {
+export function RouteManagement({ searchTerm, onSearch }: { searchTerm: string; onSearch: (value: string) => void }) {
   const [routes, setRoutes] = useState<Route[]>(mockRoutes)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingRoute, setEditingRoute] = useState<Route | null>(null)
-  const [searchTerm, setSearchTerm] = useState("")
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive' | 'maintenance'>('all');
 
   const filteredRoutes = routes.filter(
     (route) =>
-      route.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      route.origin.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      route.destination.toLowerCase().includes(searchTerm.toLowerCase()),
+      (statusFilter === 'all' || route.status === statusFilter) &&
+      (route.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        route.origin.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        route.destination.toLowerCase().includes(searchTerm.toLowerCase())),
   )
 
   const handleAddRoute = () => {
@@ -101,70 +102,53 @@ export function RouteManagement() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-end items-center">
-        <Button onClick={handleAddRoute}>
+      <div className="flex justify-between items-center">
+        {/* Status Filter Dropdown */}
+        <Select value={statusFilter === 'all' ? undefined : statusFilter} onValueChange={v => setStatusFilter((v as typeof statusFilter) || 'all')}>
+          <SelectTrigger className="w-48 rounded-lg border border-[#B7FFD2] shadow-sm bg-white text-sm font-medium">
+            <SelectValue placeholder="Filter by status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="inactive">Inactive</SelectItem>
+            <SelectItem value="maintenance">Maintenance</SelectItem>
+          </SelectContent>
+        </Select>
+        {/* Add Button */}
+        <Button onClick={handleAddRoute} className="bg-white border border-[#008F37] text-[#008F37] hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white shadow-lg rounded-lg px-4 py-2 font-semibold transition-all duration-300">
           <Plus className="mr-2 h-4 w-4" />
           Add Route
         </Button>
       </div>
 
-      {/* Search and Filters */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Search Routes</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex space-x-4">
-            <div className="flex-1">
-              <Input
-                placeholder="Search by route name, origin, or destination..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <Select>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="inactive">Inactive</SelectItem>
-                <SelectItem value="maintenance">Maintenance</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Routes Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredRoutes.map((route) => (
-          <Card key={route.id} className="hover:shadow-lg transition-shadow">
+          <Card key={route.id} className="bg-white rounded-xl shadow-lg border-0 p-6 hover:shadow-lg transition-shadow">
             <CardHeader>
               <div className="flex justify-between items-start">
                 <div>
                   <CardTitle className="text-lg">{route.name}</CardTitle>
                   <CardDescription>Route ID: {route.id}</CardDescription>
                 </div>
-                <Badge className={getStatusColor(route.status)}>{route.status}</Badge>
+                <Badge className={`${getStatusColor(route.status)} bg-[#B7FFD2] text-[#008F37] font-semibold rounded-full px-3 py-1`}>{route.status}</Badge>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center space-x-2">
-                <MapPin className="h-4 w-4 text-gray-400" />
+                <MapPin className="h-4 w-4 text-[#008F37]" />
                 <span className="text-sm">
                   {route.origin} → {route.destination}
                 </span>
               </div>
 
               <div className="flex items-center space-x-2">
-                <Clock className="h-4 w-4 text-gray-400" />
+                <Clock className="h-4 w-4 text-[#008F37]" />
                 <span className="text-sm">{route.estimatedTime}</span>
               </div>
 
               <div className="flex items-center space-x-2">
-                <DollarSign className="h-4 w-4 text-gray-400" />
+                <DollarSign className="h-4 w-4 text-[#008F37]" />
                 <span className="text-sm">GH₵ {route.fare.toFixed(2)}</span>
               </div>
 
@@ -175,11 +159,11 @@ export function RouteManagement() {
 
               <div>
                 <p className="text-sm font-medium text-gray-700 mb-1">Bus Type:</p>
-                <Badge variant="outline">{route.busType}</Badge>
+                <Badge variant="outline" className="bg-[#B7FFD2] text-[#008F37] font-semibold rounded-full px-3 py-1">{route.busType}</Badge>
               </div>
 
               <div className="flex space-x-2 pt-4">
-                <Button variant="outline" size="sm" onClick={() => handleEditRoute(route)} className="flex-1">
+                <Button variant="outline" size="sm" onClick={() => handleEditRoute(route)} className="bg-white border border-[#008F37] text-[#008F37] hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white rounded-lg px-4 py-2 font-semibold transition-all duration-300">
                   <Edit className="mr-2 h-4 w-4" />
                   Edit
                 </Button>
@@ -187,7 +171,7 @@ export function RouteManagement() {
                   variant="outline"
                   size="sm"
                   onClick={() => handleDeleteRoute(route.id)}
-                  className="text-red-600 hover:text-red-700"
+                  className="bg-white border border-[#008F37] text-[#008F37] hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white rounded-lg px-4 py-2 font-semibold transition-all duration-300"
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
@@ -199,7 +183,7 @@ export function RouteManagement() {
 
       {/* Add/Edit Route Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-full w-full max-h-[90vh] p-2 sm:p-4 overflow-y-auto flex flex-col gap-2">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto rounded-xl shadow-lg">
           <DialogHeader>
             <DialogTitle>{editingRoute ? "Edit Route" : "Add New Route"}</DialogTitle>
             <DialogDescription>
@@ -277,10 +261,12 @@ export function RouteManagement() {
           </div>
 
           <div className="flex justify-end space-x-2 pt-4">
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="bg-white border border-[#008F37] text-[#008F37] hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white rounded-lg px-4 py-2 font-semibold transition hover:shadow-lg">
               Cancel
             </Button>
-            <Button onClick={() => setIsDialogOpen(false)}>{editingRoute ? "Update Route" : "Create Route"}</Button>
+            <Button type="submit" className="bg-gradient-to-r from-[#1D976C] to-[#93F9B9] text-white shadow-lg rounded-lg px-4 py-2 font-semibold transition hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white">
+              {editingRoute ? "Update Route" : "Create Route"}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

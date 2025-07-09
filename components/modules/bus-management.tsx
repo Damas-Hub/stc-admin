@@ -197,14 +197,14 @@ const mockAuditLog = [
   { action: 'Deleted Bus', user: 'John Admin', date: '2024-05-03 09:45', details: 'GH-9876-19' },
 ];
 
-export function BusManagement() {
+export function BusManagement({ searchTerm, onSearch }: { searchTerm: string; onSearch: (value: string) => void }) {
   const { user } = useAuth();
   const [buses, setBuses] = useState<Bus[]>(mockBuses)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingBus, setEditingBus] = useState<Bus | null>(null)
-  const [searchTerm, setSearchTerm] = useState("")
   const [selectedBus, setSelectedBus] = useState<Bus | null>(null)
   const [showSeatLayout, setShowSeatLayout] = useState(false)
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'maintenance' | 'decommissioned'>('all');
 
   // Form state for add/edit
   const initialForm: Bus = editingBus || {
@@ -283,9 +283,10 @@ export function BusManagement() {
 
   const filteredBuses = buses.filter(
     (bus) =>
-      bus.registrationNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      bus.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      bus.assignedDepot.toLowerCase().includes(searchTerm.toLowerCase()),
+      (statusFilter === 'all' || bus.status === statusFilter) &&
+      (bus.registrationNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        bus.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        bus.model.toLowerCase().includes(searchTerm.toLowerCase())),
   )
 
   const handleAddBus = () => {
@@ -371,142 +372,131 @@ export function BusManagement() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-end items-center">
-        {user?.role === "hq_admin" && (
-        <Button onClick={handleAddBus}>
+      <div className="flex justify-between items-center">
+        {/* Status Filter Dropdown */}
+        <Select value={statusFilter === 'all' ? undefined : statusFilter} onValueChange={v => setStatusFilter((v as typeof statusFilter) || 'all')}>
+          <SelectTrigger className="w-48 rounded-lg border border-[#B7FFD2] shadow-sm bg-white text-sm font-medium">
+            <SelectValue placeholder="Filter by status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="maintenance">Maintenance</SelectItem>
+            <SelectItem value="decommissioned">Decommissioned</SelectItem>
+          </SelectContent>
+        </Select>
+        {/* Add Button */}
+        <Button onClick={handleAddBus} className="bg-white border border-[#008F37] text-[#008F37] hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white shadow-lg rounded-lg px-4 py-2 font-semibold transition-all duration-300">
           <Plus className="mr-2 h-4 w-4" />
           Add Bus
         </Button>
-        )}
       </div>
-
-      {/* Search and Filters */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Search Buses</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex space-x-4">
-            <div className="flex-1">
-              <Input
-                placeholder="Search by registration number, model, or station..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <Select>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="maintenance">Maintenance</SelectItem>
-                <SelectItem value="inactive">Inactive</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Buses Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredBuses.map((bus) => (
-          <Card key={bus.id} id={`bus-card-${bus.id}`} className="hover:shadow-lg transition-shadow">
-            <CardHeader>
+          <Card key={bus.id} id={`bus-card-${bus.id}`} className="hover:shadow-lg transition-shadow lg:p-8 bg-white rounded-xl shadow-lg border-0">
+            <CardHeader className="pb-4">
               <div className="flex justify-between items-start">
                 <div>
-                  <CardTitle className="text-lg">{bus.registrationNumber}</CardTitle>
-                  <CardDescription>{bus.brand} {bus.model} ({bus.yearOfManufacture})</CardDescription>
+                  <CardTitle className="text-lg font-semibold">{bus.registrationNumber}</CardTitle>
+                  <CardDescription className="text-sm text-gray-600">{bus.brand} {bus.model} ({bus.yearOfManufacture})</CardDescription>
                 </div>
-                <Badge className={getStatusColor(bus.status)}>{bus.status}</Badge>
+                <Badge className={`${getStatusColor(bus.status)} text-sm font-semibold rounded-full px-3 py-1`}>{bus.status}</Badge>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Tabs defaultValue="registration" className="w-full">
-                <TabsList className="mb-2 grid grid-cols-5">
-                  <TabsTrigger value="registration">Registration</TabsTrigger>
-                  <TabsTrigger value="specs">Specifications</TabsTrigger>
-                  <TabsTrigger value="seating">Seating</TabsTrigger>
-                  <TabsTrigger value="amenities">Amenities</TabsTrigger>
-                  <TabsTrigger value="maintenance">Maintenance</TabsTrigger>
-                </TabsList>
-                <TabsContent value="registration">
-                  <div className="text-sm text-gray-700 grid grid-cols-1 md:grid-cols-2 gap-x-4">
-                    <div>Chassis: {bus.chassisNumber}</div>
-                    <div>Engine: {bus.engineNumber}</div>
-                    <div>Date Registered: {bus.dateOfRegistration}</div>
-                    <div>License Expiry: {bus.licenseExpiryDate}</div>
-                    <div>Roadworthy: {bus.roadworthyCertificateNumber}</div>
-                    <div>Insurance: {bus.insurancePolicyNumber}</div>
-                    <div>Depot/Region: {bus.assignedDepot}</div>
-                  </div>
-                </TabsContent>
-                <TabsContent value="specs">
-                  <div className="text-sm text-gray-700 grid grid-cols-1 md:grid-cols-2 gap-x-4">
-                    <div>Brand: {bus.brand}</div>
-                    <div>Model: {bus.model}</div>
-                    <div>Year: {bus.yearOfManufacture}</div>
-                    <div>Engine Capacity: {bus.engineCapacity}</div>
-                    <div>Fuel: {bus.fuelType}</div>
-                    <div>Transmission: {bus.transmissionType}</div>
-                    <div>Odometer: {bus.odometerReading} km</div>
-                    <div>Max Load: {bus.maxLoadCapacity} kg</div>
-                    <div>Fuel Tank: {bus.fuelTankCapacity} L</div>
-              </div>
-                </TabsContent>
-                <TabsContent value="seating">
-                  <div className="text-sm text-gray-700 grid grid-cols-1 md:grid-cols-2 gap-x-4">
-                    <div>Capacity: {bus.capacity}</div>
-                    <div>Arrangement: {bus.seatArrangement}</div>
-                    <div>Numbering: {bus.seatNumberingFormat}</div>
-                    <div>Driver Seat: {bus.driverSeatPosition}</div>
-                    <div>Co-driver Seat: {bus.coDriverSeatPosition}</div>
-                    <div>Emergency Exit: {bus.emergencyExitLocation}</div>
-                    <div>Toilet: {bus.toilet ? "Yes" : "No"}</div>
-                    <div>Special Access: {bus.specialAccessSeats}</div>
-              </div>
-                </TabsContent>
-                <TabsContent value="amenities">
-                  <div className="text-sm text-gray-700 grid grid-cols-1 md:grid-cols-2 gap-x-4">
-                    <div>Air-conditioning: {bus.airConditioning ? "Yes" : "No"}</div>
-                    <div>Wi-Fi: {bus.wifi ? "Yes" : "No"}</div>
-                    <div>Entertainment: {bus.entertainmentSystem ? "Yes" : "No"}</div>
-                    <div>Reclining Seats: {bus.recliningSeats ? "Yes" : "No"}</div>
-                    <div>USB Ports: {bus.usbChargingPorts ? "Yes" : "No"}</div>
-                    <div>Reading Lights: {bus.readingLights ? "Yes" : "No"}</div>
-                    <div>CCTV: {bus.cctv ? "Yes" : "No"}</div>
-                    <div>PA System: {bus.paSystem ? "Yes" : "No"}</div>
-                    <div>Refrigerator: {bus.refrigerator ? "Yes" : "No"}</div>
-                    <div>Emergency Kit: {bus.emergencyToolsKit ? "Yes" : "No"}</div>
-              </div>
-                </TabsContent>
-                <TabsContent value="maintenance">
-              <div className="text-sm">
-                <p className="text-gray-600">Last Maintenance: {bus.lastMaintenance}</p>
-                <p className="text-gray-600">Next Maintenance: {bus.nextMaintenance}</p>
-              </div>
-                </TabsContent>
-              </Tabs>
+              <Accordion type="multiple" className="w-full rounded-xl bg-[#F8FFFB]">
+                <AccordionItem value="registration">
+                  <AccordionTrigger className="text-[#008F37] font-semibold text-base">Registration</AccordionTrigger>
+                  <AccordionContent>
+                    <div className="text-sm text-gray-700 grid grid-cols-1 md:grid-cols-2 gap-x-4">
+                      <div>Chassis: {bus.chassisNumber}</div>
+                      <div>Engine: {bus.engineNumber}</div>
+                      <div>Date Registered: {bus.dateOfRegistration}</div>
+                      <div>License Expiry: {bus.licenseExpiryDate}</div>
+                      <div>Roadworthy: {bus.roadworthyCertificateNumber}</div>
+                      <div>Insurance: {bus.insurancePolicyNumber}</div>
+                      <div>Depot/Region: {bus.assignedDepot}</div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="specs">
+                  <AccordionTrigger className="text-[#008F37] font-semibold text-base">Specifications</AccordionTrigger>
+                  <AccordionContent>
+                    <div className="text-sm text-gray-700 grid grid-cols-1 md:grid-cols-2 gap-x-4">
+                      <div>Brand: {bus.brand}</div>
+                      <div>Model: {bus.model}</div>
+                      <div>Year: {bus.yearOfManufacture}</div>
+                      <div>Engine Capacity: {bus.engineCapacity}</div>
+                      <div>Fuel: {bus.fuelType}</div>
+                      <div>Transmission: {bus.transmissionType}</div>
+                      <div>Odometer: {bus.odometerReading} km</div>
+                      <div>Max Load: {bus.maxLoadCapacity} kg</div>
+                      <div>Fuel Tank: {bus.fuelTankCapacity} L</div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="seating">
+                  <AccordionTrigger className="text-[#008F37] font-semibold text-base">Seating</AccordionTrigger>
+                  <AccordionContent>
+                    <div className="text-sm text-gray-700 grid grid-cols-1 md:grid-cols-2 gap-x-4">
+                      <div>Capacity: {bus.capacity}</div>
+                      <div>Arrangement: {bus.seatArrangement}</div>
+                      <div>Numbering: {bus.seatNumberingFormat}</div>
+                      <div>Driver Seat: {bus.driverSeatPosition}</div>
+                      <div>Co-driver Seat: {bus.coDriverSeatPosition}</div>
+                      <div>Emergency Exit: {bus.emergencyExitLocation}</div>
+                      <div>Toilet: {bus.toilet ? "Yes" : "No"}</div>
+                      <div>Special Access: {bus.specialAccessSeats}</div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="amenities">
+                  <AccordionTrigger className="text-[#008F37] font-semibold text-base">Amenities</AccordionTrigger>
+                  <AccordionContent>
+                    <div className="text-sm text-gray-700 grid grid-cols-1 md:grid-cols-2 gap-x-4">
+                      <div>Air-conditioning: {bus.airConditioning ? "Yes" : "No"}</div>
+                      <div>Wi-Fi: {bus.wifi ? "Yes" : "No"}</div>
+                      <div>Entertainment: {bus.entertainmentSystem ? "Yes" : "No"}</div>
+                      <div>Reclining Seats: {bus.recliningSeats ? "Yes" : "No"}</div>
+                      <div>USB Ports: {bus.usbChargingPorts ? "Yes" : "No"}</div>
+                      <div>Reading Lights: {bus.readingLights ? "Yes" : "No"}</div>
+                      <div>CCTV: {bus.cctv ? "Yes" : "No"}</div>
+                      <div>PA System: {bus.paSystem ? "Yes" : "No"}</div>
+                      <div>Refrigerator: {bus.refrigerator ? "Yes" : "No"}</div>
+                      <div>Emergency Kit: {bus.emergencyToolsKit ? "Yes" : "No"}</div>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="maintenance">
+                  <AccordionTrigger className="text-[#008F37] font-semibold text-base">Maintenance</AccordionTrigger>
+                  <AccordionContent>
+                    <div className="text-sm">
+                      <p className="text-gray-600">Last Maintenance: {bus.lastMaintenance}</p>
+                      <p className="text-gray-600">Next Maintenance: {bus.nextMaintenance}</p>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
               <div className="flex space-x-2 pt-4">
-                <Button variant="outline" size="sm" onClick={() => handleViewSeatLayout(bus)} className="flex-1">
+                <Button variant="outline" size="sm" onClick={() => handleViewSeatLayout(bus)} className="bg-white border border-[#008F37] text-[#008F37] hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white rounded-lg px-4 py-2 font-semibold transition-colors duration-300">
                   <Settings className="mr-2 h-4 w-4" />
                   Layout
                 </Button>
                 {user?.role === "hq_admin" && (
                   <>
-                <Button variant="outline" size="sm" onClick={() => handleEditBus(bus)}>
-                  <Edit className="h-4 w-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleDeleteBus(bus.id)}
-                  className="text-red-600 hover:text-red-700"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-                    <Button variant="outline" size="sm" onClick={() => handlePrint(bus.id)} title="Print Data Sheet">
+                    <Button variant="outline" size="sm" onClick={() => handleEditBus(bus)} className="bg-white border border-[#008F37] text-[#008F37] hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white rounded-lg px-4 py-2 font-semibold transition-colors duration-300">
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleDeleteBus(bus.id)}
+                      className="bg-white border border-[#008F37] text-[#008F37] hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white rounded-lg px-4 py-2 font-semibold transition-colors duration-300"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => handlePrint(bus.id)} title="Print Data Sheet" className="bg-white border border-[#008F37] text-[#008F37] hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white rounded-lg px-4 py-2 font-semibold transition-colors duration-300">
                       <Printer className="h-4 w-4" />
                     </Button>
                   </>
@@ -520,7 +510,7 @@ export function BusManagement() {
       {/* Add/Edit Bus Dialog - only for hq_admin */}
       {user?.role === "hq_admin" && (
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent className="max-w-full w-full max-h-[90vh] p-2 sm:p-4 overflow-y-auto flex flex-col gap-2">
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto rounded-xl shadow-lg">
           <DialogHeader>
             <DialogTitle>{editingBus ? "Edit Bus" : "Add New Bus"}</DialogTitle>
             <DialogDescription>
@@ -531,9 +521,9 @@ export function BusManagement() {
               onSubmit={handleSubmit}
               className="space-y-6"
             >
-              <Card className="border-none shadow-none">
+              <Card className="border-none shadow-none bg-white rounded-xl shadow-lg border-0 p-6">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-lg">Registration Details</CardTitle>
+                  <CardTitle className="text-lg font-semibold">Registration Details</CardTitle>
                 </CardHeader>
                 <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-0">
                   <div>
@@ -584,9 +574,9 @@ export function BusManagement() {
                 </CardContent>
               </Card>
               <div className="border-t my-2" />
-              <Card className="border-none shadow-none">
+              <Card className="border-none shadow-none bg-white rounded-xl shadow-lg border-0 p-6">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-lg">Bus Specifications</CardTitle>
+                  <CardTitle className="text-lg font-semibold">Bus Specifications</CardTitle>
                 </CardHeader>
                 <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-0">
                   <div>
@@ -646,9 +636,9 @@ export function BusManagement() {
                 </CardContent>
               </Card>
               <div className="border-t my-2" />
-              <Card className="border-none shadow-none">
+              <Card className="border-none shadow-none bg-white rounded-xl shadow-lg border-0 p-6">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-lg">Bus Seating Arrangement</CardTitle>
+                  <CardTitle className="text-lg font-semibold">Bus Seating Arrangement</CardTitle>
                 </CardHeader>
                 <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-0">
                   <div>
@@ -703,9 +693,9 @@ export function BusManagement() {
                 </CardContent>
               </Card>
               <div className="border-t my-2" />
-              <Card className="border-none shadow-none">
+              <Card className="border-none shadow-none bg-white rounded-xl shadow-lg border-0 p-6">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-lg">Amenities & Features</CardTitle>
+                  <CardTitle className="text-lg font-semibold">Amenities & Features</CardTitle>
                 </CardHeader>
                 <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-0">
                   <div>
@@ -830,9 +820,14 @@ export function BusManagement() {
           </div>
                 </CardContent>
               </Card>
-              <div className="flex justify-end gap-2 mt-4">
-                <Button type="submit">{editingBus ? "Update Bus" : "Add Bus"}</Button>
-          </div>
+              <div className="flex justify-end space-x-2 pt-4">
+                <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="bg-white border border-[#008F37] text-[#008F37] hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white rounded-lg px-4 py-2 font-semibold transition hover:shadow-lg">
+                  Cancel
+                </Button>
+                <Button type="submit" className="bg-gradient-to-r from-[#1D976C] to-[#93F9B9] text-white shadow-lg rounded-lg px-4 py-2 font-semibold transition hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white">
+                  {editingBus ? "Update Bus" : "Create Bus"}
+                </Button>
+              </div>
             </form>
         </DialogContent>
       </Dialog>
@@ -840,7 +835,7 @@ export function BusManagement() {
 
       {/* Seat Layout Dialog */}
       <Dialog open={showSeatLayout} onOpenChange={setShowSeatLayout}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md bg-white rounded-xl shadow-lg border-0 p-6">
           <DialogHeader>
             <DialogTitle>Seat Layout - {selectedBus?.registrationNumber}</DialogTitle>
             <DialogDescription>
@@ -851,16 +846,16 @@ export function BusManagement() {
           <div className="py-4">{selectedBus && renderSeatLayout(selectedBus)}</div>
 
           <div className="flex justify-end">
-            <Button onClick={() => setShowSeatLayout(false)}>Close</Button>
+            <Button onClick={() => setShowSeatLayout(false)} className="bg-gradient-to-r from-[#1D976C] to-[#93F9B9] text-white hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] shadow-lg rounded-lg px-4 py-2 font-semibold transition-colors duration-300">Close</Button>
           </div>
         </DialogContent>
       </Dialog>
 
       {/* Audit Log - only for hq_admin */}
       {user?.role === "hq_admin" && (
-        <Card className="mt-8">
+        <Card className="mt-8 bg-white rounded-xl shadow-lg border-0 p-6">
           <CardHeader>
-            <CardTitle>Audit Log</CardTitle>
+            <CardTitle className="text-lg font-semibold">Audit Log</CardTitle>
             <CardDescription>Recent changes to fleet records</CardDescription>
           </CardHeader>
           <CardContent>
@@ -868,19 +863,19 @@ export function BusManagement() {
               <table className="min-w-full text-sm">
                 <thead>
                   <tr className="border-b">
-                    <th className="px-4 py-2 text-left font-semibold">Action</th>
-                    <th className="px-4 py-2 text-left font-semibold">User</th>
-                    <th className="px-4 py-2 text-left font-semibold">Date</th>
-                    <th className="px-4 py-2 text-left font-semibold">Details</th>
+                    <th className="px-4 py-2 text-left font-semibold text-gray-700">Action</th>
+                    <th className="px-4 py-2 text-left font-semibold text-gray-700">User</th>
+                    <th className="px-4 py-2 text-left font-semibold text-gray-700">Date</th>
+                    <th className="px-4 py-2 text-left font-semibold text-gray-700">Details</th>
                   </tr>
                 </thead>
                 <tbody>
                   {mockAuditLog.map((log, idx) => (
                     <tr key={idx} className="border-b last:border-0">
-                      <td className="px-4 py-2">{log.action}</td>
-                      <td className="px-4 py-2">{log.user}</td>
-                      <td className="px-4 py-2">{log.date}</td>
-                      <td className="px-4 py-2">{log.details}</td>
+                      <td className="px-4 py-2 text-gray-700">{log.action}</td>
+                      <td className="px-4 py-2 text-gray-700">{log.user}</td>
+                      <td className="px-4 py-2 text-gray-700">{log.date}</td>
+                      <td className="px-4 py-2 text-gray-700">{log.details}</td>
                     </tr>
                   ))}
                 </tbody>

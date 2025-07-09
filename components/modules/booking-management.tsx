@@ -9,6 +9,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Plus, Edit, Trash2, User, Calendar, CreditCard, MapPin, Armchair } from "lucide-react"
+// Remove Tabs import and usage for status filter
+// Use Select for status filter
 
 interface Booking {
   id: string
@@ -62,19 +64,20 @@ const mockBookings: Booking[] = [
   },
 ]
 
-export function BookingManagement() {
+export function BookingManagement({ searchTerm, onSearch }: { searchTerm: string; onSearch: (value: string) => void }) {
   const [bookings, setBookings] = useState<Booking[]>(mockBookings)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isSeatDialogOpen, setIsSeatDialogOpen] = useState(false)
   const [editingBooking, setEditingBooking] = useState<Booking | null>(null)
-  const [searchTerm, setSearchTerm] = useState("")
   const [selectedSeats, setSelectedSeats] = useState<string[]>([])
+  const [statusFilter, setStatusFilter] = useState<'all' | 'confirmed' | 'cancelled' | 'completed'>('all');
 
   const filteredBookings = bookings.filter(
     (booking) =>
-      booking.bookingRef.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      booking.passengerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      booking.passengerPhone.includes(searchTerm),
+      (statusFilter === 'all' || booking.bookingStatus === statusFilter) &&
+      (booking.bookingRef.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        booking.passengerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        booking.passengerPhone.includes(searchTerm)),
   )
 
   const handleAddBooking = () => {
@@ -195,46 +198,29 @@ export function BookingManagement() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-end items-center">
-        <Button onClick={handleAddBooking}>
+      <div className="flex justify-between items-center">
+        {/* Status Filter Dropdown */}
+        <Select value={statusFilter === 'all' ? undefined : statusFilter} onValueChange={v => setStatusFilter((v as typeof statusFilter) || 'all')}>
+          <SelectTrigger className="w-48 rounded-lg border border-[#B7FFD2] shadow-sm bg-white text-sm font-medium">
+            <SelectValue placeholder="Filter by status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="confirmed">Confirmed</SelectItem>
+            <SelectItem value="cancelled">Cancelled</SelectItem>
+            <SelectItem value="completed">Completed</SelectItem>
+          </SelectContent>
+        </Select>
+        {/* Add Button */}
+        <Button onClick={handleAddBooking} className="bg-white border border-[#008F37] text-[#008F37] hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white shadow-lg rounded-lg px-4 py-2 font-semibold transition-all duration-300">
           <Plus className="mr-2 h-4 w-4" />
           New Booking
         </Button>
       </div>
 
-      {/* Search and Filters */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Search Bookings</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex space-x-4">
-            <div className="flex-1">
-              <Input
-                placeholder="Search by booking reference, passenger name, or phone..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <Select>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="confirmed">Confirmed</SelectItem>
-                <SelectItem value="cancelled">Cancelled</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Bookings Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredBookings.map((booking) => (
-          <Card key={booking.id} className="hover:shadow-lg transition-shadow">
+          <Card key={booking.id} className="bg-white rounded-xl shadow-lg border-0 p-6 hover:shadow-lg transition-shadow">
             <CardHeader>
               <div className="flex justify-between items-start">
                 <div>
@@ -280,7 +266,7 @@ export function BookingManagement() {
               </div>
 
               <div className="flex space-x-2 pt-4">
-                <Button variant="outline" size="sm" onClick={() => handleEditBooking(booking)} className="flex-1">
+                <Button variant="outline" size="sm" onClick={() => handleEditBooking(booking)} className="bg-white border border-[#008F37] text-[#008F37] hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white rounded-lg px-4 py-2 font-semibold transition-all duration-300">
                   <Edit className="mr-2 h-4 w-4" />
                   Edit
                 </Button>
@@ -288,7 +274,7 @@ export function BookingManagement() {
                   variant="outline"
                   size="sm"
                   onClick={() => handleDeleteBooking(booking.id)}
-                  className="text-red-600 hover:text-red-700"
+                  className="bg-white border border-[#008F37] text-[#008F37] hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white rounded-lg px-4 py-2 font-semibold transition-all duration-300"
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
@@ -300,11 +286,11 @@ export function BookingManagement() {
 
       {/* Add/Edit Booking Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-full w-full max-h-[90vh] p-2 sm:p-4 overflow-y-auto flex flex-col gap-2">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto rounded-xl shadow-lg">
           <DialogHeader>
             <DialogTitle>{editingBooking ? "Edit Booking" : "New Booking"}</DialogTitle>
             <DialogDescription>
-              {editingBooking ? "Update booking information" : "Create a new passenger booking"}
+              {editingBooking ? "Update booking information" : "Create a new booking"}
             </DialogDescription>
           </DialogHeader>
 
@@ -370,7 +356,7 @@ export function BookingManagement() {
                   defaultValue={editingBooking?.seatNumber}
                   className="flex-1"
                 />
-                <Button type="button" variant="outline" onClick={handleSeatSelection}>
+                <Button type="button" variant="outline" onClick={handleSeatSelection} className="bg-white border border-[#008F37] text-[#008F37] hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white rounded-lg px-4 py-2 font-semibold transition-all duration-300">
                   Select Seat
                 </Button>
               </div>
@@ -411,10 +397,10 @@ export function BookingManagement() {
           </div>
 
           <div className="flex justify-end space-x-2 pt-4">
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="bg-white border border-[#008F37] text-[#008F37] hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white rounded-lg px-4 py-2 font-semibold transition hover:shadow-lg">
               Cancel
             </Button>
-            <Button onClick={() => setIsDialogOpen(false)}>
+            <Button type="submit" className="bg-gradient-to-r from-[#1D976C] to-[#93F9B9] text-white shadow-lg rounded-lg px-4 py-2 font-semibold transition hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white">
               {editingBooking ? "Update Booking" : "Create Booking"}
             </Button>
           </div>
@@ -428,17 +414,15 @@ export function BookingManagement() {
             <DialogTitle>Select Seats</DialogTitle>
             <DialogDescription>Choose available seats for the passenger</DialogDescription>
           </DialogHeader>
-
           <div className="py-4">{renderSeatMap()}</div>
-
-          <div className="flex justify-between items-center pt-4">
-            <div className="text-sm text-gray-600">Selected: {selectedSeats.join(", ") || "None"}</div>
-            <div className="space-x-2">
-              <Button variant="outline" onClick={() => setIsSeatDialogOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={() => setIsSeatDialogOpen(false)}>Confirm Selection</Button>
-            </div>
+          <div className="text-sm text-gray-600 mb-4">Selected: {selectedSeats.join(", ") || "None"}</div>
+          <div className="flex flex-col sm:flex-row justify-end items-center gap-3 pt-2">
+            <Button variant="outline" onClick={() => setIsSeatDialogOpen(false)} className="bg-white border border-[#008F37] text-[#008F37] hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white rounded-lg px-4 py-2 font-semibold transition-all duration-300 w-full sm:w-auto">
+              Cancel
+            </Button>
+            <Button onClick={() => setIsSeatDialogOpen(false)} className="bg-gradient-to-r from-[#1D976C] to-[#93F9B9] text-white shadow-lg hover:shadow-xl rounded-lg px-4 py-2 font-semibold transition-all duration-300 w-full sm:w-auto">
+              Confirm Selection
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

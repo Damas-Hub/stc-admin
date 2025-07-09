@@ -10,6 +10,8 @@ import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Plus, Edit, Trash2, Package, MapPin, Weight, Truck } from "lucide-react"
+// Remove Tabs import and usage for status filter
+// Use Select for status filter
 
 interface Parcel {
   id: string
@@ -85,17 +87,18 @@ const mockParcels: Parcel[] = [
   },
 ]
 
-export function ParcelManagement() {
+export function ParcelManagement({ searchTerm, onSearch }: { searchTerm: string; onSearch: (value: string) => void }) {
   const [parcels, setParcels] = useState<Parcel[]>(mockParcels)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingParcel, setEditingParcel] = useState<Parcel | null>(null)
-  const [searchTerm, setSearchTerm] = useState("")
+  const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'in_transit' | 'delivered' | 'cancelled'>('all');
 
   const filteredParcels = parcels.filter(
     (parcel) =>
-      parcel.trackingNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      parcel.senderName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      parcel.receiverName.toLowerCase().includes(searchTerm.toLowerCase()),
+      (statusFilter === 'all' || parcel.status === statusFilter) &&
+      (parcel.trackingNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        parcel.senderName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        parcel.receiverName.toLowerCase().includes(searchTerm.toLowerCase())),
   )
 
   const handleAddParcel = () => {
@@ -129,54 +132,39 @@ export function ParcelManagement() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-end items-center">
-        <Button onClick={handleAddParcel}>
+      <div className="flex justify-between items-center">
+        {/* Status Filter Dropdown */}
+        <Select value={statusFilter === 'all' ? undefined : statusFilter} onValueChange={v => setStatusFilter((v as typeof statusFilter) || 'all')}>
+          <SelectTrigger className="w-48 rounded-lg border border-[#B7FFD2] shadow-sm bg-white text-sm font-medium">
+            <SelectValue placeholder="Filter by status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="pending">Pending</SelectItem>
+            <SelectItem value="in_transit">In Transit</SelectItem>
+            <SelectItem value="delivered">Delivered</SelectItem>
+            <SelectItem value="cancelled">Cancelled</SelectItem>
+          </SelectContent>
+        </Select>
+        {/* Add Button */}
+        <Button onClick={handleAddParcel} className="bg-white border border-[#008F37] text-[#008F37] hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white shadow-lg rounded-lg px-4 py-2 font-semibold transition-all duration-300">
           <Plus className="mr-2 h-4 w-4" />
           New Parcel
         </Button>
       </div>
 
-      {/* Search and Filters */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Search Parcels</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex space-x-4">
-            <div className="flex-1">
-              <Input
-                placeholder="Search by tracking number, sender, or receiver..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <Select>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="in_transit">In Transit</SelectItem>
-                <SelectItem value="delivered">Delivered</SelectItem>
-                <SelectItem value="cancelled">Cancelled</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Parcels Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredParcels.map((parcel) => (
-          <Card key={parcel.id} className="hover:shadow-lg transition-shadow">
+          <Card key={parcel.id} className="bg-white rounded-xl shadow-lg border-0 p-6 hover:shadow-lg transition-shadow">
             <CardHeader>
               <div className="flex justify-between items-start">
                 <div>
                   <CardTitle className="text-lg">{parcel.trackingNumber}</CardTitle>
                   <CardDescription>{parcel.description}</CardDescription>
                 </div>
-                <Badge className={getStatusColor(parcel.status)}>{parcel.status.replace("_", " ")}</Badge>
+                <Badge className={`${getStatusColor(parcel.status)} rounded-full px-3 py-1 font-semibold`}>
+                  {parcel.status.replace("_", " ")}
+                </Badge>
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -194,26 +182,26 @@ export function ParcelManagement() {
               </div>
 
               <div className="flex items-center space-x-2">
-                <MapPin className="h-4 w-4 text-gray-400" />
+                <MapPin className="h-4 w-4 text-[#008F37]" />
                 <span className="text-sm">
                   {parcel.originStation} → {parcel.destinationStation}
                 </span>
               </div>
 
               <div className="flex items-center space-x-2">
-                <Weight className="h-4 w-4 text-gray-400" />
+                <Weight className="h-4 w-4 text-[#008F37]" />
                 <span className="text-sm">
                   {parcel.weight} kg - {parcel.dimensions}
                 </span>
               </div>
 
               <div className="flex items-center space-x-2">
-                <Truck className="h-4 w-4 text-gray-400" />
+                <Truck className="h-4 w-4 text-[#008F37]" />
                 <span className="text-sm">Trip: {parcel.assignedTrip}</span>
               </div>
 
               <div className="flex items-center space-x-2">
-                <Package className="h-4 w-4 text-gray-400" />
+                <Package className="h-4 w-4 text-[#008F37]" />
                 <span className="text-sm font-medium">GH₵ {parcel.price.toFixed(2)}</span>
               </div>
 
@@ -223,7 +211,7 @@ export function ParcelManagement() {
               </div>
 
               <div className="flex space-x-2 pt-4">
-                <Button variant="outline" size="sm" onClick={() => handleEditParcel(parcel)} className="flex-1">
+                <Button variant="outline" size="sm" onClick={() => handleEditParcel(parcel)} className="bg-white border border-[#008F37] text-[#008F37] hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white rounded-lg px-4 py-2 font-semibold transition hover:shadow-lg">
                   <Edit className="mr-2 h-4 w-4" />
                   Edit
                 </Button>
@@ -231,7 +219,7 @@ export function ParcelManagement() {
                   variant="outline"
                   size="sm"
                   onClick={() => handleDeleteParcel(parcel.id)}
-                  className="text-red-600 hover:text-red-700"
+                  className="bg-white border border-[#008F37] text-[#008F37] hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white rounded-lg px-4 py-2 font-semibold transition hover:shadow-lg"
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
@@ -382,10 +370,10 @@ export function ParcelManagement() {
           </div>
 
           <div className="flex justify-end space-x-2 pt-4">
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="bg-white border border-[#008F37] text-[#008F37] hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white rounded-lg px-4 py-2 font-semibold transition hover:shadow-lg">
               Cancel
             </Button>
-            <Button onClick={() => setIsDialogOpen(false)}>
+            <Button onClick={() => setIsDialogOpen(false)} className="bg-gradient-to-r from-[#1D976C] to-[#93F9B9] text-white shadow-lg rounded-lg px-4 py-2 font-semibold transition hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white">
               {editingParcel ? "Update Parcel" : "Create Parcel Booking"}
             </Button>
           </div>

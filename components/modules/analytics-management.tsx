@@ -502,11 +502,11 @@ const DonutChart = ({ data, total }: { data: { label: string; value: number; col
   )
 }
 
-export function AnalyticsDashboard() {
+export function AnalyticsDashboard({ searchTerm, onSearch }: { searchTerm: string; onSearch: (value: string) => void }) {
   const [activeTab, setActiveTab] = useState("overview")
 
   const StatCard = ({ title, value, change, icon: Icon, prefix = "", suffix = "" }: any) => (
-    <Card className="hover:shadow-lg transition-shadow">
+    <Card className="hover:shadow-lg transition-shadow bg-white rounded-xl border-0">
       <CardContent className="p-6">
         <div className="flex items-center justify-between">
           <div>
@@ -519,18 +519,18 @@ export function AnalyticsDashboard() {
             {change !== undefined && (
               <div className="flex items-center mt-1">
                 {change >= 0 ? (
-                  <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
+                  <TrendingUp className="h-4 w-4 text-[#008F37] mr-1" />
                 ) : (
                   <TrendingDown className="h-4 w-4 text-red-500 mr-1" />
                 )}
-                <span className={`text-sm ${change >= 0 ? "text-green-600" : "text-red-600"}`}>
+                <span className={`text-sm ${change >= 0 ? "text-[#008F37]" : "text-red-600"}`}>
                   {Math.abs(change)}%
                 </span>
               </div>
             )}
           </div>
-          <div className="p-3 bg-green-100 rounded-full">
-            <Icon className="h-6 w-6 text-green-600" />
+          <div className="p-3 bg-[#B7FFD2] rounded-full">
+            <Icon className="h-6 w-6 text-[#008F37]" />
           </div>
         </div>
       </CardContent>
@@ -545,7 +545,7 @@ export function AnalyticsDashboard() {
       case "delivered":
       case "arrived":
       case "confirmed":
-        return "bg-green-100 text-green-800"
+        return "bg-[#B7FFD2] text-[#008F37]"
       case "pending":
       case "scheduled":
       case "in-transit":
@@ -574,39 +574,39 @@ export function AnalyticsDashboard() {
       <div className="py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-4 lg:w-auto lg:grid-cols-9">
-            <TabsTrigger value="overview" className="flex items-center gap-2">
+            <TabsTrigger value="overview">
               <BarChart3 className="h-4 w-4" />
               <span className="hidden sm:inline">Overview</span>
             </TabsTrigger>
-            <TabsTrigger value="revenue" className="flex items-center gap-2">
+            <TabsTrigger value="revenue">
               <DollarSign className="h-4 w-4" />
               <span className="hidden sm:inline">Revenue</span>
             </TabsTrigger>
-            <TabsTrigger value="performance" className="flex items-center gap-2">
+            <TabsTrigger value="performance">
               <TrendingUp className="h-4 w-4" />
               <span className="hidden sm:inline">Performance</span>
             </TabsTrigger>
-            <TabsTrigger value="operations" className="flex items-center gap-2">
+            <TabsTrigger value="operations">
               <Activity className="h-4 w-4" />
               <span className="hidden sm:inline">Operations</span>
             </TabsTrigger>
-            <TabsTrigger value="bookings-track" className="flex items-center gap-2">
+            <TabsTrigger value="bookings-track">
               <CheckCircle className="h-4 w-4" />
               <span className="hidden sm:inline">Bookings</span>
             </TabsTrigger>
-            <TabsTrigger value="trips-track" className="flex items-center gap-2">
+            <TabsTrigger value="trips-track">
               <MapPin className="h-4 w-4" />
               <span className="hidden sm:inline">Trips</span>
             </TabsTrigger>
-            <TabsTrigger value="buses-track" className="flex items-center gap-2">
+            <TabsTrigger value="buses-track">
               <BusIcon className="h-4 w-4" />
               <span className="hidden sm:inline">Buses</span>
             </TabsTrigger>
-            <TabsTrigger value="fuel-track" className="flex items-center gap-2">
+            <TabsTrigger value="fuel-track">
               <Activity className="h-4 w-4" />
               <span className="hidden sm:inline">Fuel</span>
             </TabsTrigger>
-            <TabsTrigger value="parcels-track" className="flex items-center gap-2">
+            <TabsTrigger value="parcels-track">
               <Package className="h-4 w-4" />
               <span className="hidden sm:inline">Parcels</span>
             </TabsTrigger>
@@ -635,7 +635,7 @@ export function AnalyticsDashboard() {
 
             {/* Charts Row */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
+              <Card className="bg-white rounded-xl shadow-lg border-0">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <BarChart3 className="h-5 w-5" />
@@ -647,7 +647,7 @@ export function AnalyticsDashboard() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="bg-white rounded-xl shadow-lg border-0">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <TrendingUp className="h-5 w-5" />
@@ -684,7 +684,7 @@ export function AnalyticsDashboard() {
           {/* Revenue Analytics */}
           <TabsContent value="revenue" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <Card className="lg:col-span-2">
+              <Card className="lg:col-span-2 bg-white rounded-xl shadow-lg border-0 p-6">
                 <CardHeader>
                   <CardTitle>Revenue Breakdown by Route</CardTitle>
                 </CardHeader>
@@ -706,7 +706,7 @@ export function AnalyticsDashboard() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="bg-white rounded-xl shadow-lg border-0 p-6">
                 <CardHeader>
                   <CardTitle>Revenue Distribution</CardTitle>
                 </CardHeader>
@@ -747,7 +747,7 @@ export function AnalyticsDashboard() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Card>
+              <Card className="bg-white rounded-xl shadow-lg border-0 p-6">
                 <CardContent className="p-6">
                   <div className="text-center">
                     <div className="text-3xl font-bold text-green-600">GHS 2,083</div>
@@ -760,7 +760,7 @@ export function AnalyticsDashboard() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="bg-white rounded-xl shadow-lg border-0 p-6">
                 <CardContent className="p-6">
                   <div className="text-center">
                     <div className="text-3xl font-bold text-blue-600">GHS 100</div>
@@ -773,7 +773,7 @@ export function AnalyticsDashboard() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="bg-white rounded-xl shadow-lg border-0 p-6">
                 <CardContent className="p-6">
                   <div className="text-center">
                     <div className="text-3xl font-bold text-purple-600">21</div>
@@ -791,7 +791,7 @@ export function AnalyticsDashboard() {
           {/* Performance Analytics */}
           <TabsContent value="performance" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
+              <Card className="bg-white rounded-xl shadow-lg border-0 p-6">
                 <CardHeader>
                   <CardTitle>Top Performing Routes</CardTitle>
                 </CardHeader>
@@ -813,7 +813,7 @@ export function AnalyticsDashboard() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="bg-white rounded-xl shadow-lg border-0 p-6">
                 <CardHeader>
                   <CardTitle>Top Drivers</CardTitle>
                 </CardHeader>
@@ -840,29 +840,21 @@ export function AnalyticsDashboard() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <Card>
-                <CardContent className="p-6 text-center">
-                  <div className="text-2xl font-bold text-green-600">89%</div>
-                  <div className="text-sm text-gray-600">Average Occupancy</div>
-                </CardContent>
+              <Card className="bg-white rounded-xl shadow-lg border-0 p-6 text-center">
+                <div className="text-2xl font-bold text-green-600">89%</div>
+                <div className="text-sm text-gray-600">Average Occupancy</div>
               </Card>
-              <Card>
-                <CardContent className="p-6 text-center">
-                  <div className="text-2xl font-bold text-blue-600">4.7</div>
-                  <div className="text-sm text-gray-600">Customer Rating</div>
-                </CardContent>
+              <Card className="bg-white rounded-xl shadow-lg border-0 p-6 text-center">
+                <div className="text-2xl font-bold text-blue-600">4.7</div>
+                <div className="text-sm text-gray-600">Customer Rating</div>
               </Card>
-              <Card>
-                <CardContent className="p-6 text-center">
-                  <div className="text-2xl font-bold text-purple-600">94%</div>
-                  <div className="text-sm text-gray-600">On-Time Rate</div>
-                </CardContent>
+              <Card className="bg-white rounded-xl shadow-lg border-0 p-6 text-center">
+                <div className="text-2xl font-bold text-purple-600">94%</div>
+                <div className="text-sm text-gray-600">On-Time Rate</div>
               </Card>
-              <Card>
-                <CardContent className="p-6 text-center">
-                  <div className="text-2xl font-bold text-orange-600">2.3%</div>
-                  <div className="text-sm text-gray-600">Cancellation Rate</div>
-                </CardContent>
+              <Card className="bg-white rounded-xl shadow-lg border-0 p-6 text-center">
+                <div className="text-2xl font-bold text-orange-600">2.3%</div>
+                <div className="text-sm text-gray-600">Cancellation Rate</div>
               </Card>
             </div>
           </TabsContent>
@@ -870,7 +862,7 @@ export function AnalyticsDashboard() {
           {/* Operations Analytics */}
           <TabsContent value="operations" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
+              <Card className="bg-white rounded-xl shadow-lg border-0 p-6">
                 <CardHeader>
                   <CardTitle>Fleet Utilization</CardTitle>
                 </CardHeader>
@@ -901,7 +893,7 @@ export function AnalyticsDashboard() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="bg-white rounded-xl shadow-lg border-0 p-6">
                 <CardHeader>
                   <CardTitle>Driver Status</CardTitle>
                 </CardHeader>
@@ -934,33 +926,25 @@ export function AnalyticsDashboard() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <Card>
-                <CardContent className="p-6 text-center">
-                  <BusIcon className="h-8 w-8 text-green-600 mx-auto mb-2" />
-                  <div className="text-2xl font-bold text-gray-900">156</div>
-                  <div className="text-sm text-gray-600">Trips Today</div>
-                </CardContent>
+              <Card className="bg-white rounded-xl shadow-lg border-0 p-6 text-center">
+                <BusIcon className="h-8 w-8 text-green-600 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-gray-900">156</div>
+                <div className="text-sm text-gray-600">Trips Today</div>
               </Card>
-              <Card>
-                <CardContent className="p-6 text-center">
-                  <Package className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-                  <div className="text-2xl font-bold text-gray-900">89</div>
-                  <div className="text-sm text-gray-600">Parcels in Transit</div>
-                </CardContent>
+              <Card className="bg-white rounded-xl shadow-lg border-0 p-6 text-center">
+                <Package className="h-8 w-8 text-blue-600 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-gray-900">89</div>
+                <div className="text-sm text-gray-600">Parcels in Transit</div>
               </Card>
-              <Card>
-                <CardContent className="p-6 text-center">
-                  <MapPin className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-                  <div className="text-2xl font-bold text-gray-900">12</div>
-                  <div className="text-sm text-gray-600">Active Routes</div>
-                </CardContent>
+              <Card className="bg-white rounded-xl shadow-lg border-0 p-6 text-center">
+                <MapPin className="h-8 w-8 text-purple-600 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-gray-900">12</div>
+                <div className="text-sm text-gray-600">Active Routes</div>
               </Card>
-              <Card>
-                <CardContent className="p-6 text-center">
-                  <Calendar className="h-8 w-8 text-orange-600 mx-auto mb-2" />
-                  <div className="text-2xl font-bold text-gray-900">23</div>
-                  <div className="text-sm text-gray-600">Scheduled Trips</div>
-                </CardContent>
+              <Card className="bg-white rounded-xl shadow-lg border-0 p-6 text-center">
+                <Calendar className="h-8 w-8 text-orange-600 mx-auto mb-2" />
+                <div className="text-2xl font-bold text-gray-900">23</div>
+                <div className="text-sm text-gray-600">Scheduled Trips</div>
               </Card>
             </div>
           </TabsContent>
@@ -971,33 +955,25 @@ export function AnalyticsDashboard() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-              <Card>
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-blue-600">23</div>
-                  <div className="text-sm text-gray-600">Active Bookings</div>
-                </CardContent>
+              <Card className="bg-white rounded-xl shadow-lg border-0 p-4 text-center">
+                <div className="text-2xl font-bold text-blue-600">23</div>
+                <div className="text-sm text-gray-600">Active Bookings</div>
               </Card>
-              <Card>
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-green-600">156</div>
-                  <div className="text-sm text-gray-600">Completed Today</div>
-                </CardContent>
+              <Card className="bg-white rounded-xl shadow-lg border-0 p-4 text-center">
+                <div className="text-2xl font-bold text-green-600">156</div>
+                <div className="text-sm text-gray-600">Completed Today</div>
               </Card>
-              <Card>
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-yellow-600">8</div>
-                  <div className="text-sm text-gray-600">Checked In</div>
-                </CardContent>
+              <Card className="bg-white rounded-xl shadow-lg border-0 p-4 text-center">
+                <div className="text-2xl font-bold text-yellow-600">8</div>
+                <div className="text-sm text-gray-600">Checked In</div>
               </Card>
-              <Card>
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-purple-600">12</div>
-                  <div className="text-sm text-gray-600">Boarded</div>
-                </CardContent>
+              <Card className="bg-white rounded-xl shadow-lg border-0 p-4 text-center">
+                <div className="text-2xl font-bold text-purple-600">12</div>
+                <div className="text-sm text-gray-600">Boarded</div>
               </Card>
             </div>
 
-            <Card>
+            <Card className="bg-white rounded-xl shadow-lg border-0 p-0">
               <CardHeader>
                 <CardTitle>Recent Bookings</CardTitle>
               </CardHeader>
@@ -1044,33 +1020,25 @@ export function AnalyticsDashboard() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-              <Card>
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-blue-600">8</div>
-                  <div className="text-sm text-gray-600">In Transit</div>
-                </CardContent>
+              <Card className="bg-white rounded-xl shadow-lg border-0 p-4 text-center">
+                <div className="text-2xl font-bold text-blue-600">8</div>
+                <div className="text-sm text-gray-600">In Transit</div>
               </Card>
-              <Card>
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-green-600">12</div>
-                  <div className="text-sm text-gray-600">Completed</div>
-                </CardContent>
+              <Card className="bg-white rounded-xl shadow-lg border-0 p-4 text-center">
+                <div className="text-2xl font-bold text-green-600">12</div>
+                <div className="text-sm text-gray-600">Completed</div>
               </Card>
-              <Card>
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-yellow-600">5</div>
-                  <div className="text-sm text-gray-600">Scheduled</div>
-                </CardContent>
+              <Card className="bg-white rounded-xl shadow-lg border-0 p-4 text-center">
+                <div className="text-2xl font-bold text-yellow-600">5</div>
+                <div className="text-sm text-gray-600">Scheduled</div>
               </Card>
-              <Card>
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-red-600">1</div>
-                  <div className="text-sm text-gray-600">Delayed</div>
-                </CardContent>
+              <Card className="bg-white rounded-xl shadow-lg border-0 p-4 text-center">
+                <div className="text-2xl font-bold text-red-600">1</div>
+                <div className="text-sm text-gray-600">Delayed</div>
               </Card>
             </div>
 
-            <Card>
+            <Card className="bg-white rounded-xl shadow-lg border-0 p-0">
               <CardHeader>
                 <CardTitle>Active Trips</CardTitle>
               </CardHeader>
@@ -1128,33 +1096,25 @@ export function AnalyticsDashboard() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-              <Card>
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-green-600">32</div>
-                  <div className="text-sm text-gray-600">Active Buses</div>
-                </CardContent>
+              <Card className="bg-white rounded-xl shadow-lg border-0 p-4 text-center">
+                <div className="text-2xl font-bold text-green-600">32</div>
+                <div className="text-sm text-gray-600">Active Buses</div>
               </Card>
-              <Card>
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-blue-600">8</div>
-                  <div className="text-sm text-gray-600">Idle</div>
-                </CardContent>
+              <Card className="bg-white rounded-xl shadow-lg border-0 p-4 text-center">
+                <div className="text-2xl font-bold text-blue-600">8</div>
+                <div className="text-sm text-gray-600">Idle</div>
               </Card>
-              <Card>
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-yellow-600">3</div>
-                  <div className="text-sm text-gray-600">Maintenance</div>
-                </CardContent>
+              <Card className="bg-white rounded-xl shadow-lg border-0 p-4 text-center">
+                <div className="text-2xl font-bold text-yellow-600">3</div>
+                <div className="text-sm text-gray-600">Maintenance</div>
               </Card>
-              <Card>
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-red-600">2</div>
-                  <div className="text-sm text-gray-600">Offline</div>
-                </CardContent>
+              <Card className="bg-white rounded-xl shadow-lg border-0 p-4 text-center">
+                <div className="text-2xl font-bold text-red-600">2</div>
+                <div className="text-sm text-gray-600">Offline</div>
               </Card>
             </div>
 
-            <Card>
+            <Card className="bg-white rounded-xl shadow-lg border-0 p-0">
               <CardHeader>
                 <CardTitle>Fleet Status</CardTitle>
               </CardHeader>
@@ -1214,33 +1174,25 @@ export function AnalyticsDashboard() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-              <Card>
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-blue-600">175.8L</div>
-                  <div className="text-sm text-gray-600">Total Consumed Today</div>
-                </CardContent>
+              <Card className="bg-white rounded-xl shadow-lg border-0 p-4 text-center">
+                <div className="text-2xl font-bold text-blue-600">175.8L</div>
+                <div className="text-sm text-gray-600">Total Consumed Today</div>
               </Card>
-              <Card>
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-green-600">6.2L</div>
-                  <div className="text-sm text-gray-600">Average per 100km</div>
-                </CardContent>
+              <Card className="bg-white rounded-xl shadow-lg border-0 p-4 text-center">
+                <div className="text-2xl font-bold text-green-600">6.2L</div>
+                <div className="text-sm text-gray-600">Average per 100km</div>
               </Card>
-              <Card>
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-yellow-600">GHS 1,056</div>
-                  <div className="text-sm text-gray-600">Daily Fuel Cost</div>
-                </CardContent>
+              <Card className="bg-white rounded-xl shadow-lg border-0 p-4 text-center">
+                <div className="text-2xl font-bold text-yellow-600">GHS 1,056</div>
+                <div className="text-sm text-gray-600">Daily Fuel Cost</div>
               </Card>
-              <Card>
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-purple-600">92%</div>
-                  <div className="text-sm text-gray-600">Efficiency Rate</div>
-                </CardContent>
+              <Card className="bg-white rounded-xl shadow-lg border-0 p-4 text-center">
+                <div className="text-2xl font-bold text-purple-600">92%</div>
+                <div className="text-sm text-gray-600">Efficiency Rate</div>
               </Card>
             </div>
 
-            <Card>
+            <Card className="bg-white rounded-xl shadow-lg border-0 p-0">
               <CardHeader>
                 <CardTitle>Fuel Consumption by Bus</CardTitle>
               </CardHeader>
@@ -1294,33 +1246,25 @@ export function AnalyticsDashboard() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-12">
-              <Card>
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-blue-600">45</div>
-                  <div className="text-sm text-gray-600">In Transit</div>
-                </CardContent>
+              <Card className="bg-white rounded-xl shadow-lg border-0 p-4 text-center">
+                <div className="text-2xl font-bold text-blue-600">45</div>
+                <div className="text-sm text-gray-600">In Transit</div>
               </Card>
-              <Card>
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-green-600">128</div>
-                  <div className="text-sm text-gray-600">Delivered Today</div>
-                </CardContent>
+              <Card className="bg-white rounded-xl shadow-lg border-0 p-4 text-center">
+                <div className="text-2xl font-bold text-green-600">128</div>
+                <div className="text-sm text-gray-600">Delivered Today</div>
               </Card>
-              <Card>
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-yellow-600">12</div>
-                  <div className="text-sm text-gray-600">At Destination</div>
-                </CardContent>
+              <Card className="bg-white rounded-xl shadow-lg border-0 p-4 text-center">
+                <div className="text-2xl font-bold text-yellow-600">12</div>
+                <div className="text-sm text-gray-600">At Destination</div>
               </Card>
-              <Card>
-                <CardContent className="p-4 text-center">
-                  <div className="text-2xl font-bold text-red-600">3</div>
-                  <div className="text-sm text-gray-600">Failed Delivery</div>
-                </CardContent>
+              <Card className="bg-white rounded-xl shadow-lg border-0 p-4 text-center">
+                <div className="text-2xl font-bold text-red-600">3</div>
+                <div className="text-sm text-gray-600">Failed Delivery</div>
               </Card>
             </div>
 
-            <Card>
+            <Card className="bg-white rounded-xl shadow-lg border-0 p-0">
               <CardHeader>
                 <CardTitle>Active Parcel Deliveries</CardTitle>
               </CardHeader>

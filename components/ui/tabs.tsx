@@ -14,7 +14,8 @@ const TabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      "inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground",
+      // Modern, branded tab bar styles
+      "flex items-center w-full gap-2 bg-white rounded-xl shadow-md p-2 overflow-x-auto",
       className
     )}
     {...props}
@@ -29,7 +30,12 @@ const TabsTrigger = React.forwardRef<
   <TabsPrimitive.Trigger
     ref={ref}
     className={cn(
-      "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background bg-muted text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow data-[state=active]:border-2 data-[state=active]:border-primary",
+      // Unified, modern tab styles
+      "px-6 py-2 rounded-xl font-semibold transition-all duration-200 min-w-[120px] text-center select-none focus:outline-none focus:ring-2 focus:ring-[#008F37] focus-visible:ring-2 focus-visible:ring-[#008F37] focus:border-[#008F37] focus-visible:border-[#008F37] focus:z-10",
+      // Active tab: white bg, green border, black text, subtle shadow
+      "data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:border data-[state=active]:border-[#008F37] data-[state=active]:shadow-md data-[state=active]:scale-105",
+      // Inactive tab: white bg, green text, border on hover/focus
+      "data-[state=inactive]:bg-white data-[state=inactive]:text-[#008F37] data-[state=inactive]:border-0 hover:border-[#008F37] hover:border hover:text-[#008F37] hover:bg-white",
       className
     )}
     {...props}

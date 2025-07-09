@@ -23,19 +23,19 @@ export function Sidebar({ activeModule, setActiveModule, mobileOpen, setMobileOp
       id: "dashboard" as ActiveModule,
       label: "Dashboard",
       icon: LayoutDashboard,
-      roles: ["hq_admin", "station_personnel", "driver"],
+      roles: ["hq_admin", "regional_manager", "operations_officer", "maintenance_officer"],
     },
     {
       id: "routes" as ActiveModule,
       label: "Routes",
       icon: Route,
-      roles: ["hq_admin"],
+      roles: ["hq_admin", "regional_manager"],
     },
     {
       id: "buses" as ActiveModule,
       label: "Buses",
       icon: Bus,
-      roles: ["hq_admin"],
+      roles: ["hq_admin", "regional_manager", "operations_officer", "maintenance_officer"],
     },
     {
       id: "drivers" as ActiveModule,
@@ -53,25 +53,25 @@ export function Sidebar({ activeModule, setActiveModule, mobileOpen, setMobileOp
       id: "schedules" as ActiveModule,
       label: "Schedules",
       icon: Calendar,
-      roles: ["hq_admin", "station_personnel", "driver"],
+      roles: ["hq_admin", "regional_manager", "operations_officer", "maintenance_officer"],
     },
     {
       id: "bookings" as ActiveModule,
       label: "Bookings",
       icon: Ticket,
-      roles: ["hq_admin", "station_personnel"],
+      roles: ["hq_admin", "operations_officer"],
     },
     {
       id: "parcels" as ActiveModule,
       label: "Parcels",
       icon: Package,
-      roles: ["hq_admin", "station_personnel"],
+      roles: ["hq_admin"],
     },
     {
       id: "analytics" as ActiveModule,
       label: "Analytics",
       icon: ChartBar,
-      roles: ["hq_admin"],
+      roles: ["hq_admin", "regional_manager"],
     },
 
   ]
@@ -80,13 +80,13 @@ export function Sidebar({ activeModule, setActiveModule, mobileOpen, setMobileOp
   // Sidebar content as a function for reuse
   const sidebarContent = (
     <>
-      <div className="p-4 sm:p-6 border-b bg-black flex items-center justify-between">
+      <div className="p-4 sm:p-6 border-b flex items-center justify-between" style={{ background: 'linear-gradient(262.17deg, #00662A 0%, #008F37 60%, #93F9B9 100%)' }}>
         <div className="flex items-center space-x-2">
-          <img src="/stc-logo.png" alt="STC Ghana" className="h-8 w-auto sm:h-10" />
+          <img src="/stc-logo.png" alt="STC Ghana" className="h-8 w-auto sm:h-10 drop-shadow-lg" />
         </div>
         {/* Mobile close button */}
         <button
-          className="sm:hidden p-1 rounded-full hover:bg-gray-200 text-white"
+          className="sm:hidden p-1 rounded-full hover:bg-[#B7FFD2] text-white"
           onClick={() => setMobileOpen(false)}
           aria-label="Close sidebar"
         >
@@ -96,32 +96,37 @@ export function Sidebar({ activeModule, setActiveModule, mobileOpen, setMobileOp
       <nav className="flex-1 p-2 sm:p-4 space-y-2">
         {filteredMenuItems.map((item) => {
           const Icon = item.icon;
+          const isActive = activeModule === item.id;
           return (
             <Button
               key={item.id}
-              variant={activeModule === item.id ? "default" : "ghost"}
+              variant="ghost"
               className={cn(
-                "w-full justify-start text-base md:text-sm lg:text-base py-2 sm:py-2.5 px-2 sm:px-3",
-                activeModule === item.id && "bg-green-600 text-white hover:bg-green-700"
+                "w-full justify-start text-base md:text-sm lg:text-base py-2 sm:py-2.5 px-2 sm:px-3 flex items-center gap-2 font-medium transition-all",
+                isActive
+                  ? "bg-white text-[#008F37] font-bold shadow rounded-lg"
+                  : "bg-transparent text-white hover:bg-[#B7FFD2]/30 hover:text-[#008F37]",
+                "group"
               )}
+              style={isActive ? { boxShadow: '0 2px 8px 0 rgba(0,143,55,0.08)' } : {}}
               onClick={() => {
                 setActiveModule(item.id);
                 setMobileOpen(false);
               }}
             >
-              <Icon className="mr-3 h-5 w-5 md:h-4 md:w-4 lg:h-5 lg:w-5" />
+              <Icon className={cn("mr-3 h-5 w-5 md:h-4 md:w-4 lg:h-5 lg:w-5 transition-all", isActive ? "text-[#008F37]" : "text-white group-hover:text-[#008F37]")} />
               {item.label}
             </Button>
           );
         })}
       </nav>
       <div className="p-2 sm:p-4 border-t">
-        <div className="mb-2 sm:mb-4">
-          <p className="text-sm font-medium text-gray-900">{user?.name}</p>
+        <div className="mb-2 sm:mb-4 bg-white rounded-lg shadow border-l-4 border-[#008F37] p-3 flex flex-col items-start">
+          <p className="text-sm font-semibold text-[#008F37]">{user?.name}</p>
           <p className="text-xs text-gray-500">{user?.email}</p>
-          <p className="text-xs text-green-600 capitalize">{user?.role?.replace("_", " ")}</p>
+          <p className="text-xs text-[#008F37] capitalize">{user?.role?.replace("_", " ")}</p>
         </div>
-        <Button variant="outline" className="w-full justify-start py-2 px-2" onClick={logout}>
+        <Button variant="outline" className="w-full justify-start py-2 px-2 border-[#008F37] text-[#008F37] font-semibold hover:bg-[#B7FFD2] hover:text-[#008F37]" onClick={logout}>
           <LogOut className="mr-3 h-4 w-4" />
           Sign Out
         </Button>
@@ -132,7 +137,7 @@ export function Sidebar({ activeModule, setActiveModule, mobileOpen, setMobileOp
   // Main sidebar (hidden on mobile)
   return (
     <>
-      <div className="hidden sm:flex flex-col bg-white shadow-lg h-full w-64 md:w-48 lg:w-64 transition-all duration-200">
+      <div className="hidden sm:flex flex-col h-full w-64 md:w-56 lg:w-64 transition-all duration-200 shadow-xl" style={{ background: 'linear-gradient(262.17deg, #00662A 0%, #008F37 60%, #93F9B9 100%)', borderTopRightRadius: '2rem', borderBottomRightRadius: '2rem' }}>
         {sidebarContent}
       </div>
       {/* Mobile Slide-in Drawer */}
@@ -147,6 +152,7 @@ export function Sidebar({ activeModule, setActiveModule, mobileOpen, setMobileOp
         {/* Drawer */}
         <div
           className={`fixed top-0 left-0 h-full w-56 bg-white shadow-lg transform transition-transform duration-300 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}
+          style={{ background: 'linear-gradient(262.17deg, #00662A 0%, #008F37 60%, #93F9B9 100%)', borderTopRightRadius: '2rem', borderBottomRightRadius: '2rem' }}
         >
           {sidebarContent}
         </div>
