@@ -70,17 +70,18 @@ const mockDrivers: Driver[] = [
   },
 ]
 
-export function DriverManagement() {
+export function DriverManagement({ searchTerm, onSearch }: { searchTerm: string; onSearch: (value: string) => void }) {
   const [drivers, setDrivers] = useState<Driver[]>(mockDrivers)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingDriver, setEditingDriver] = useState<Driver | null>(null)
-  const [searchTerm, setSearchTerm] = useState("")
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive' | 'suspended'>('all');
 
   const filteredDrivers = drivers.filter(
     (driver) =>
-      driver.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      driver.driverId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      driver.licenseNumber.toLowerCase().includes(searchTerm.toLowerCase()),
+      (statusFilter === 'all' || driver.status === statusFilter) &&
+      (driver.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        driver.driverId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        driver.licenseNumber.toLowerCase().includes(searchTerm.toLowerCase())),
   )
 
   const handleAddDriver = () => {
@@ -119,46 +120,29 @@ export function DriverManagement() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-end items-center">
-        <Button onClick={handleAddDriver}>
+      <div className="flex justify-between items-center">
+        {/* Status Filter Dropdown */}
+        <Select value={statusFilter === 'all' ? undefined : statusFilter} onValueChange={v => setStatusFilter((v as typeof statusFilter) || 'all')}>
+          <SelectTrigger className="w-48 rounded-lg border border-[#B7FFD2] shadow-sm bg-white text-sm font-medium">
+            <SelectValue placeholder="Filter by status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="inactive">Inactive</SelectItem>
+            <SelectItem value="suspended">Suspended</SelectItem>
+          </SelectContent>
+        </Select>
+        {/* Add Button */}
+        <Button onClick={handleAddDriver} className="bg-white border border-[#008F37] text-[#008F37] hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white shadow-lg rounded-lg px-4 py-2 font-semibold transition-all duration-300">
           <Plus className="mr-2 h-4 w-4" />
           Add Driver
         </Button>
       </div>
 
-      {/* Search and Filters */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Search Drivers</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex space-x-4">
-            <div className="flex-1">
-              <Input
-                placeholder="Search by name, driver ID, or license number..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <Select>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="inactive">Inactive</SelectItem>
-                <SelectItem value="suspended">Suspended</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Drivers Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredDrivers.map((driver) => (
-          <Card key={driver.id} className="hover:shadow-lg transition-shadow">
+          <Card key={driver.id} className="bg-white rounded-xl shadow-lg border-0 p-6 hover:shadow-lg transition-shadow">
             <CardHeader>
               <div className="flex justify-between items-start">
                 <div>
@@ -177,17 +161,17 @@ export function DriverManagement() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center space-x-2">
-                <Mail className="h-4 w-4 text-gray-400" />
+                <Mail className="h-4 w-4 text-[#008F37]" />
                 <span className="text-sm">{driver.email}</span>
               </div>
 
               <div className="flex items-center space-x-2">
-                <Phone className="h-4 w-4 text-gray-400" />
+                <Phone className="h-4 w-4 text-[#008F37]" />
                 <span className="text-sm">{driver.phone}</span>
               </div>
 
               <div className="flex items-center space-x-2">
-                <Bus className="h-4 w-4 text-gray-400" />
+                <Bus className="h-4 w-4 text-[#008F37]" />
                 <span className="text-sm">Bus: {driver.assignedBus}</span>
               </div>
 
@@ -204,7 +188,7 @@ export function DriverManagement() {
               </div>
 
               <div className="flex space-x-2 pt-4">
-                <Button variant="outline" size="sm" onClick={() => handleEditDriver(driver)} className="flex-1">
+                <Button variant="outline" size="sm" onClick={() => handleEditDriver(driver)} className="bg-white border border-[#008F37] text-[#008F37] hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white rounded-lg px-4 py-2 font-semibold transition-all duration-300">
                   <Edit className="mr-2 h-4 w-4" />
                   Edit
                 </Button>
@@ -212,7 +196,7 @@ export function DriverManagement() {
                   variant="outline"
                   size="sm"
                   onClick={() => handleDeleteDriver(driver.id)}
-                  className="text-red-600 hover:text-red-700"
+                  className="bg-white border border-[#008F37] text-[#008F37] hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white rounded-lg px-4 py-2 font-semibold transition-all duration-300"
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
@@ -224,11 +208,11 @@ export function DriverManagement() {
 
       {/* Add/Edit Driver Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto rounded-xl shadow-lg">
           <DialogHeader>
             <DialogTitle>{editingDriver ? "Edit Driver" : "Add New Driver"}</DialogTitle>
             <DialogDescription>
-              {editingDriver ? "Update driver information" : "Add a new driver to the system"}
+              {editingDriver ? "Update driver information" : "Add a new driver to the fleet"}
             </DialogDescription>
           </DialogHeader>
 
@@ -303,10 +287,12 @@ export function DriverManagement() {
           </div>
 
           <div className="flex justify-end space-x-2 pt-4">
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="bg-white border border-[#008F37] text-[#008F37] hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white rounded-lg px-4 py-2 font-semibold transition hover:shadow-lg">
               Cancel
             </Button>
-            <Button onClick={() => setIsDialogOpen(false)}>{editingDriver ? "Update Driver" : "Add Driver"}</Button>
+            <Button type="submit" className="bg-gradient-to-r from-[#1D976C] to-[#93F9B9] text-white shadow-lg rounded-lg px-4 py-2 font-semibold transition hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white">
+              {editingDriver ? "Update Driver" : "Create Driver"}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

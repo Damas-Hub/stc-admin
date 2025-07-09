@@ -72,14 +72,16 @@ export function DashboardOverview() {
   return (
     <div className="space-y-6">
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {stats.map((stat, index) => {
           const Icon = stat.icon
           return (
-            <Card key={index}>
+            <Card key={index} className="bg-white rounded-xl shadow-lg border-0">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-gray-600">{stat.title}</CardTitle>
-                <Icon className="h-4 w-4 text-gray-400" />
+                <div className="h-10 w-10 flex items-center justify-center rounded-full bg-[#B7FFD2] shadow">
+                  <Icon className="h-5 w-5 text-[#008F37]" />
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold text-gray-900">{stat.value}</div>
@@ -91,8 +93,8 @@ export function DashboardOverview() {
       </div>
 
       {/* Recent Activities */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <Card className="bg-white rounded-xl shadow-lg border-0">
           <CardHeader>
             <CardTitle>Recent Activities</CardTitle>
             <CardDescription>Latest updates and actions in the system</CardDescription>
@@ -113,7 +115,7 @@ export function DashboardOverview() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="bg-white rounded-xl shadow-lg border-0">
           <CardHeader>
             <CardTitle>System Alerts</CardTitle>
             <CardDescription>Important notifications and warnings</CardDescription>

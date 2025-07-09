@@ -71,18 +71,20 @@ const mockSchedules: Schedule[] = [
   },
 ]
 
-export function ScheduleManagement() {
+export function ScheduleManagement({ searchTerm, onSearch }: { searchTerm: string; onSearch: (value: string) => void }) {
   const [schedules, setSchedules] = useState<Schedule[]>(mockSchedules)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingSchedule, setEditingSchedule] = useState<Schedule | null>(null)
   const [selectedDate, setSelectedDate] = useState("2024-03-15")
   const [activeTab, setActiveTab] = useState("daily")
+  const [statusFilter, setStatusFilter] = useState<'all' | 'scheduled' | 'in_progress' | 'completed' | 'cancelled'>('all');
 
   const filteredSchedules = schedules.filter((schedule) => {
+    const statusMatch = statusFilter === 'all' ? true : schedule.status === statusFilter;
     if (activeTab === "daily") {
-      return schedule.date === selectedDate
+      return statusMatch && schedule.date === selectedDate;
     }
-    return true
+    return statusMatch;
   })
 
   const handleAddSchedule = () => {
@@ -122,8 +124,21 @@ export function ScheduleManagement() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-end items-center">
-        <Button onClick={handleAddSchedule}>
+      <div className="flex justify-between items-center">
+        {/* Status Filter Dropdown */}
+        <Select value={statusFilter === 'all' ? undefined : statusFilter} onValueChange={v => setStatusFilter((v as typeof statusFilter) || 'all')}>
+          <SelectTrigger className="w-48 rounded-lg border border-[#B7FFD2] shadow-sm bg-white text-sm font-medium">
+            <SelectValue placeholder="Filter by status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="scheduled">Scheduled</SelectItem>
+            <SelectItem value="in_progress">In Progress</SelectItem>
+            <SelectItem value="completed">Completed</SelectItem>
+            <SelectItem value="cancelled">Cancelled</SelectItem>
+          </SelectContent>
+        </Select>
+        {/* Add Button */}
+        <Button onClick={handleAddSchedule} className="bg-white border border-[#008F37] text-[#008F37] hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white shadow-lg rounded-lg px-4 py-2 font-semibold transition-all duration-300">
           <Plus className="mr-2 h-4 w-4" />
           Add Schedule
         </Button>
@@ -138,7 +153,7 @@ export function ScheduleManagement() {
         </TabsList>
 
         <TabsContent value="daily" className="space-y-4">
-          <Card>
+          <Card className="bg-white rounded-xl shadow-lg border-0 p-6">
             <CardHeader>
               <CardTitle>Daily Schedule</CardTitle>
               <CardDescription>View and manage today's trips</CardDescription>
@@ -161,37 +176,39 @@ export function ScheduleManagement() {
             {filteredSchedules.map((schedule) => {
               const occupancyPercentage = (schedule.bookedSeats / schedule.totalSeats) * 100
               return (
-                <Card key={schedule.id} className="hover:shadow-lg transition-shadow">
+                <Card key={schedule.id} className="bg-white rounded-xl shadow-lg border-0 p-6">
                   <CardHeader>
                     <div className="flex justify-between items-start">
                       <div>
                         <CardTitle className="text-lg">{schedule.routeName}</CardTitle>
                         <CardDescription>Schedule ID: {schedule.id}</CardDescription>
                       </div>
-                      <Badge className={getStatusColor(schedule.status)}>{schedule.status.replace("_", " ")}</Badge>
+                      <Badge className={`${getStatusColor(schedule.status)} rounded-full px-3 py-1 font-semibold`}>
+                        {schedule.status.replace("_", " ")}
+                      </Badge>
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex items-center space-x-2">
-                      <Calendar className="h-4 w-4 text-gray-400" />
-                      <span className="text-sm">{schedule.date}</span>
+                      <Calendar className="h-4 w-4 text-[#008F37]" />
+                      <span className="text-sm">Date: {schedule.date}</span>
                     </div>
 
                     <div className="flex items-center space-x-2">
-                      <Clock className="h-4 w-4 text-gray-400" />
+                      <Clock className="h-4 w-4 text-[#008F37]" />
                       <span className="text-sm">
-                        {schedule.departureTime} - {schedule.arrivalTime}
+                        Departure: {schedule.departureTime} - Arrival: {schedule.arrivalTime}
                       </span>
                     </div>
 
                     <div className="flex items-center space-x-2">
-                      <Bus className="h-4 w-4 text-gray-400" />
-                      <span className="text-sm">{schedule.busId}</span>
+                      <Bus className="h-4 w-4 text-[#008F37]" />
+                      <span className="text-sm">Bus: {schedule.busId}</span>
                     </div>
 
                     <div className="flex items-center space-x-2">
-                      <User className="h-4 w-4 text-gray-400" />
-                      <span className="text-sm">{schedule.driverName}</span>
+                      <User className="h-4 w-4 text-[#008F37]" />
+                      <span className="text-sm">Driver: {schedule.driverName}</span>
                     </div>
 
                     <div className="bg-gray-50 p-3 rounded-lg">
@@ -214,7 +231,7 @@ export function ScheduleManagement() {
                         variant="outline"
                         size="sm"
                         onClick={() => handleEditSchedule(schedule)}
-                        className="flex-1"
+                        className="bg-white border border-[#008F37] text-[#008F37] hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white shadow-lg rounded-lg px-4 py-2 font-semibold transition-all duration-300"
                       >
                         <Edit className="mr-2 h-4 w-4" />
                         Edit
@@ -223,7 +240,7 @@ export function ScheduleManagement() {
                         variant="outline"
                         size="sm"
                         onClick={() => handleDeleteSchedule(schedule.id)}
-                        className="text-red-600 hover:text-red-700"
+                        className="bg-white border border-[#008F37] text-[#008F37] hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white shadow-lg rounded-lg px-4 py-2 font-semibold transition-all duration-300"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -236,7 +253,7 @@ export function ScheduleManagement() {
         </TabsContent>
 
         <TabsContent value="weekly" className="space-y-4">
-          <Card>
+          <Card className="bg-white rounded-xl shadow-lg border-0 p-6">
             <CardHeader>
               <CardTitle>Weekly Schedule</CardTitle>
               <CardDescription>Overview of the week's scheduled trips</CardDescription>
@@ -250,7 +267,7 @@ export function ScheduleManagement() {
         </TabsContent>
 
         <TabsContent value="monthly" className="space-y-4">
-          <Card>
+          <Card className="bg-white rounded-xl shadow-lg border-0 p-6">
             <CardHeader>
               <CardTitle>Monthly Schedule</CardTitle>
               <CardDescription>Monthly overview of all scheduled trips</CardDescription>
@@ -264,7 +281,7 @@ export function ScheduleManagement() {
 
       {/* Add/Edit Schedule Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto rounded-xl shadow-lg">
           <DialogHeader>
             <DialogTitle>{editingSchedule ? "Edit Schedule" : "Add New Schedule"}</DialogTitle>
             <DialogDescription>
@@ -347,10 +364,10 @@ export function ScheduleManagement() {
           </div>
 
           <div className="flex justify-end space-x-2 pt-4">
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="bg-white border border-[#008F37] text-[#008F37] hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white rounded-lg px-4 py-2 font-semibold transition hover:shadow-lg">
               Cancel
             </Button>
-            <Button onClick={() => setIsDialogOpen(false)}>
+            <Button type="submit" className="bg-gradient-to-r from-[#1D976C] to-[#93F9B9] text-white shadow-lg rounded-lg px-4 py-2 font-semibold transition hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white">
               {editingSchedule ? "Update Schedule" : "Create Schedule"}
             </Button>
           </div>

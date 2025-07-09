@@ -62,17 +62,18 @@ const mockStaff: Staff[] = [
   },
 ]
 
-export function StaffManagement() {
+export function StaffManagement({ searchTerm, onSearch }: { searchTerm: string; onSearch: (value: string) => void }) {
   const [staff, setStaff] = useState<Staff[]>(mockStaff)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingStaff, setEditingStaff] = useState<Staff | null>(null)
-  const [searchTerm, setSearchTerm] = useState("")
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'inactive'>('all');
 
   const filteredStaff = staff.filter(
     (member) =>
-      member.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      member.staffId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      member.role.toLowerCase().includes(searchTerm.toLowerCase()),
+      (statusFilter === 'all' || member.status === statusFilter) &&
+      (member.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        member.staffId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        member.role.toLowerCase().includes(searchTerm.toLowerCase())),
   )
 
   const handleAddStaff = () => {
@@ -115,46 +116,28 @@ export function StaffManagement() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-end items-center">
-        <Button onClick={handleAddStaff}>
+      <div className="flex justify-between items-center">
+        {/* Status Filter Dropdown */}
+        <Select value={statusFilter === 'all' ? undefined : statusFilter} onValueChange={v => setStatusFilter((v as typeof statusFilter) || 'all')}>
+          <SelectTrigger className="w-48 rounded-lg border border-[#B7FFD2] shadow-sm bg-white text-sm font-medium">
+            <SelectValue placeholder="Filter by status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="inactive">Inactive</SelectItem>
+          </SelectContent>
+        </Select>
+        {/* Add Button */}
+        <Button onClick={handleAddStaff} className="bg-white border border-[#008F37] text-[#008F37] hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white shadow-lg rounded-lg px-4 py-2 font-semibold transition-all duration-300">
           <Plus className="mr-2 h-4 w-4" />
           Add Staff
         </Button>
       </div>
 
-      {/* Search and Filters */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Search Staff</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex space-x-4">
-            <div className="flex-1">
-              <Input
-                placeholder="Search by name, staff ID, or role..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <Select>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="Filter by role" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Roles</SelectItem>
-                <SelectItem value="Station Manager">Station Manager</SelectItem>
-                <SelectItem value="Booking Agent">Booking Agent</SelectItem>
-                <SelectItem value="Customer Service">Customer Service</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Staff Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredStaff.map((staffMember) => (
-          <Card key={staffMember.id} className="hover:shadow-lg transition-shadow">
+          <Card key={staffMember.id} className="bg-white rounded-xl shadow-lg border-0 p-6 hover:shadow-lg transition-shadow">
             <CardHeader>
               <div className="flex justify-between items-start">
                 <div>
@@ -166,22 +149,22 @@ export function StaffManagement() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center space-x-2">
-                <Shield className="h-4 w-4 text-gray-400" />
+                <Shield className="h-4 w-4 text-[#008F37]" />
                 <Badge className={getRoleColor(staffMember.role)}>{staffMember.role}</Badge>
               </div>
 
               <div className="flex items-center space-x-2">
-                <Mail className="h-4 w-4 text-gray-400" />
+                <Mail className="h-4 w-4 text-[#008F37]" />
                 <span className="text-sm">{staffMember.email}</span>
               </div>
 
               <div className="flex items-center space-x-2">
-                <Phone className="h-4 w-4 text-gray-400" />
+                <Phone className="h-4 w-4 text-[#008F37]" />
                 <span className="text-sm">{staffMember.phone}</span>
               </div>
 
               <div className="flex items-center space-x-2">
-                <MapPin className="h-4 w-4 text-gray-400" />
+                <MapPin className="h-4 w-4 text-[#008F37]" />
                 <span className="text-sm">{staffMember.assignedStation}</span>
               </div>
 
@@ -189,7 +172,7 @@ export function StaffManagement() {
                 <p className="font-medium text-gray-700 mb-1">Permissions:</p>
                 <div className="flex flex-wrap gap-1">
                   {staffMember.permissions.map((permission, index) => (
-                    <Badge key={index} variant="outline" className="text-xs">
+                    <Badge key={index} variant="outline" className="text-xs bg-[#B7FFD2] text-[#008F37] font-semibold rounded-full px-3 py-1">
                       {permission.replace("_", " ")}
                     </Badge>
                   ))}
@@ -201,7 +184,7 @@ export function StaffManagement() {
               </div>
 
               <div className="flex space-x-2 pt-4">
-                <Button variant="outline" size="sm" onClick={() => handleEditStaff(staffMember)} className="flex-1">
+                <Button variant="outline" size="sm" onClick={() => handleEditStaff(staffMember)} className="bg-white border border-[#008F37] text-[#008F37] hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white rounded-lg px-4 py-2 font-semibold transition">
                   <Edit className="mr-2 h-4 w-4" />
                   Edit
                 </Button>
@@ -209,7 +192,7 @@ export function StaffManagement() {
                   variant="outline"
                   size="sm"
                   onClick={() => handleDeleteStaff(staffMember.id)}
-                  className="text-red-600 hover:text-red-700"
+                  className="bg-white border border-[#008F37] text-[#008F37] hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white rounded-lg px-4 py-2 font-semibold transition"
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
@@ -221,7 +204,7 @@ export function StaffManagement() {
 
       {/* Add/Edit Staff Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto rounded-xl shadow-lg">
           <DialogHeader>
             <DialogTitle>{editingStaff ? "Edit Staff Member" : "Add New Staff Member"}</DialogTitle>
             <DialogDescription>
@@ -300,10 +283,12 @@ export function StaffManagement() {
           </div>
 
           <div className="flex justify-end space-x-2 pt-4">
-            <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+            <Button variant="outline" onClick={() => setIsDialogOpen(false)} className="bg-white border border-[#008F37] text-[#008F37] hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white rounded-lg px-4 py-2 font-semibold transition hover:shadow-lg">
               Cancel
             </Button>
-            <Button onClick={() => setIsDialogOpen(false)}>{editingStaff ? "Update Staff" : "Add Staff"}</Button>
+            <Button type="submit" className="bg-gradient-to-r from-[#1D976C] to-[#93F9B9] text-white shadow-lg rounded-lg px-4 py-2 font-semibold transition hover:bg-gradient-to-r hover:from-[#1D976C] hover:to-[#93F9B9] hover:text-white">
+              {editingStaff ? "Update Staff" : "Create Staff"}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
