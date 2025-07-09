@@ -13,14 +13,24 @@ import { BookingManagement } from "../modules/booking-management"
 import { ParcelManagement } from "../modules/parcel-management"
 import { useAuth } from "../auth/auth-context"
 import { AnalyticsDashboard } from "../modules/analytics-management"
+import { FinancialManagement } from "../modules/financial-management";
 
-export type ActiveModule = "dashboard" | "routes" | "buses" | "drivers" | "staff" | "schedules" | "bookings" | "parcels" | "analytics"
+export type ActiveModule = "dashboard" | "routes" | "buses" | "drivers" | "staff" | "schedules" | "bookings" | "parcels" | "analytics" | "finance-dashboard" | "finance-revenue" | "finance-bookings" | "finance-parcels" | "finance-expenses" | "finance-reports";
 
 export function Dashboard() {
-  const [activeModule, setActiveModule] = useState<ActiveModule>("dashboard")
   const { user } = useAuth()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState("");
+
+  // Set default active module based on user role
+  const getDefaultModule = (): ActiveModule => {
+    if (user?.role === "finance") {
+      return "finance-dashboard";
+    }
+    return "dashboard";
+  };
+
+  const [activeModule, setActiveModule] = useState<ActiveModule>(getDefaultModule());
 
   const renderActiveModule = () => {
     switch (activeModule) {
@@ -42,6 +52,13 @@ export function Dashboard() {
         return <ParcelManagement searchTerm={searchTerm} onSearch={setSearchTerm} />
       case "analytics":
         return <AnalyticsDashboard searchTerm={searchTerm} onSearch={setSearchTerm} />
+      case "finance-dashboard":
+      case "finance-revenue":
+      case "finance-bookings":
+      case "finance-parcels":
+      case "finance-expenses":
+      case "finance-reports":
+        return <FinancialManagement activeModule={activeModule} searchTerm={searchTerm} onSearch={setSearchTerm} />;
       default:
         return <DashboardOverview />
     }

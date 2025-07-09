@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "../auth/auth-context"
 import type { ActiveModule } from "./dashboard"
-import { LayoutDashboard, Route, Bus, Users, UserCheck, Calendar, Ticket, Package, LogOut, ChartBar, Menu, X } from "lucide-react"
+import { LayoutDashboard, Route, Bus, Users, UserCheck, Calendar, Ticket, Package, LogOut, ChartBar, Menu, X, DollarSign, TrendingDown, FileText } from "lucide-react"
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useState } from "react";
 
@@ -73,7 +73,42 @@ export function Sidebar({ activeModule, setActiveModule, mobileOpen, setMobileOp
       icon: ChartBar,
       roles: ["hq_admin", "regional_manager"],
     },
-
+    {
+      id: "finance-dashboard" as ActiveModule,
+      label: "Dashboard",
+      icon: ChartBar,
+      roles: ["finance"],
+    },
+    {
+      id: "finance-revenue" as ActiveModule,
+      label: "Revenue",
+      icon: DollarSign,
+      roles: ["finance"],
+    },
+    {
+      id: "finance-bookings" as ActiveModule,
+      label: "Bookings",
+      icon: Ticket,
+      roles: ["finance"],
+    },
+    {
+      id: "finance-parcels" as ActiveModule,
+      label: "Parcels",
+      icon: Package,
+      roles: ["finance"],
+    },
+    {
+      id: "finance-expenses" as ActiveModule,
+      label: "Expenses",
+      icon: TrendingDown,
+      roles: ["finance"],
+    },
+    {
+      id: "finance-reports" as ActiveModule,
+      label: "Reports",
+      icon: FileText,
+      roles: ["finance"],
+    },
   ]
   const filteredMenuItems = menuItems.filter((item) => item.roles.includes(user?.role || ""));
 

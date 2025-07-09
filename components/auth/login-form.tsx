@@ -33,6 +33,7 @@ export function LoginForm() {
     { label: "Regional Manager", email: "regional@stc.com" },
     { label: "Operations Officer", email: "ops@stc.com" },
     { label: "Maintenance Officer", email: "maint@stc.com" },
+    { label: "Finance Department", email: "finance@stc.com" },
   ];
 
   return (
@@ -112,6 +113,7 @@ export function LoginForm() {
                 <p><strong>Regional Manager:</strong> regional@stc.com</p>
                 <p><strong>Operations Officer:</strong> ops@stc.com</p>
                 <p><strong>Maintenance Officer:</strong> maint@stc.com</p>
+                <p><strong>Finance Department:</strong> finance@stc.com</p>
                 <p><strong>Password:</strong> password</p>
               </div>
             </div>

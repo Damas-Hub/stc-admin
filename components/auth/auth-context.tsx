@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, type ReactNode } from "react"
 
-export type UserRole = "hq_admin" | "regional_manager" | "operations_officer" | "maintenance_officer"
+export type UserRole = "hq_admin" | "regional_manager" | "operations_officer" | "maintenance_officer" | "finance"
 
 export interface User {
   id: string
@@ -49,6 +49,12 @@ const mockUsers: User[] = [
     email: "maint@stc.com",
     role: "maintenance_officer",
     stationId: "takoradi-station",
+  },
+  {
+    id: "7",
+    name: "Felicia Finance",
+    email: "finance@stc.com",
+    role: "finance",
   },
 ]
 
