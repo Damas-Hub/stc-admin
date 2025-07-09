@@ -564,6 +564,7 @@ export function BusManagement({ searchTerm, onSearch }: { searchTerm: string; on
                     <Input id="assignedDepot" value={form.assignedDepot} onChange={handleChange} required />
                   </div>
                   <div>
+                    
                     <Label htmlFor="status">Operational Status</Label>
                     <Select value={form.status} onValueChange={value => setForm({ ...form, status: value })}>
                       <SelectTrigger id="status">
