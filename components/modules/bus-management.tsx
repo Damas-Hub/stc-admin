@@ -197,6 +197,10 @@ const mockAuditLog = [
   { action: 'Deleted Bus', user: 'John Admin', date: '2024-05-03 09:45', details: 'GH-9876-19' },
 ];
 
+// Add StatusFilter type
+
+type StatusFilter = 'all' | 'active' | 'maintenance' | 'decommissioned';
+
 export function BusManagement({ searchTerm, onSearch }: { searchTerm: string; onSearch: (value: string) => void }) {
   const { user } = useAuth();
   const [buses, setBuses] = useState<Bus[]>(mockBuses)
@@ -204,7 +208,7 @@ export function BusManagement({ searchTerm, onSearch }: { searchTerm: string; on
   const [editingBus, setEditingBus] = useState<Bus | null>(null)
   const [selectedBus, setSelectedBus] = useState<Bus | null>(null)
   const [showSeatLayout, setShowSeatLayout] = useState(false)
-  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'maintenance' | 'decommissioned'>('all');
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
 
   // Form state for add/edit
   const initialForm: Bus = editingBus || {
@@ -374,11 +378,12 @@ export function BusManagement({ searchTerm, onSearch }: { searchTerm: string; on
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         {/* Status Filter Dropdown */}
-        <Select value={statusFilter === 'all' ? undefined : statusFilter} onValueChange={v => setStatusFilter((v as typeof statusFilter) || 'all')}>
+        <Select value={statusFilter} onValueChange={v => setStatusFilter(v as StatusFilter)}>
           <SelectTrigger className="w-48 rounded-lg border border-[#B7FFD2] shadow-sm bg-white text-sm font-medium">
             <SelectValue placeholder="Filter by status" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="all">All</SelectItem>
             <SelectItem value="active">Active</SelectItem>
             <SelectItem value="maintenance">Maintenance</SelectItem>
             <SelectItem value="decommissioned">Decommissioned</SelectItem>

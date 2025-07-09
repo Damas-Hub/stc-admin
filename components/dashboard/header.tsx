@@ -79,9 +79,6 @@ export function Header({ isDashboard, onOpenSidebar, activeModule, onSearch, use
             onChange={e => onSearch(e.target.value)}
           />
         </div>
-        <button className="relative p-2 rounded-full hover:bg-gray-100">
-          <Bell className="h-6 w-6 text-gray-700" />
-        </button>
       </div>
       {/* Notification, Settings, and Profile */}
       <div className="flex items-center space-x-3 ml-4">
